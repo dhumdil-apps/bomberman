@@ -6,7 +6,7 @@ public class Main {
          System.out.println("i'm fun at parties :D");
 
         // Init
-        public Field f = new Field(5);
+        Field f = new Field(5);
 
     }
 
@@ -17,10 +17,10 @@ public class Field {
     // field
     private Block[][] board;
     private int size;
+
     // characters
     private Hero hero;
     private Enemy[] enemies;
-    private Brick[] bricks;
 
     Field(int size) {
 
@@ -49,7 +49,7 @@ public class Field {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
 
-                if (i % 2 && j % 2) {
+                if ((i%2 != 0) && (j%2 != 0)) {
                     this.board[i][j].type = 1;
                 } else {
                     this.board[i][j].type = 0;
@@ -83,7 +83,7 @@ public class Field {
             int randomY = i; // left
 
             this.board[randomX][randomY].type = 4; // enemy
-            this.enemies[i] = Enemy(randomX, randomY);
+            this.enemies[i] = new Enemy(randomX, randomY);
         }
 
     }
@@ -94,16 +94,42 @@ public class Field {
 
         // creates a horizontal wall of bricks in the middle
         int middle = 3;
-        this.bricks = new Brick[size];
         for (int i = 0; i < size; i++) {
             this.board[middle][i].type = 2; // brick
-            this.bricks[i] = new Brick(middle, i);
         }
 
     }
 
     public void placeBomb(int x, int y) {
         this.board[x][y].type = 5;
+    }
+
+    private void printField() {
+
+        for (int i = 0; i < this.size; i++) {
+
+            for (int j = 0; j < this.size; j++) {
+                System.out.print("\t");
+                System.out.print( this.shiftTypeToChar(this.board[i][j].type) );
+            }
+
+            System.out.println();
+        }
+
+    }
+
+    private String shiftTypeToChar(int type) {
+
+        switch (type) {
+            case 0: return " ";
+            case 1: return "W";
+            case 2: return "B";
+            case 3: return "H";
+            case 4: return "E";
+            case 5: return "B";
+            default: return "";
+        }
+
     }
 
 }
@@ -127,13 +153,7 @@ public class Block {
 
 }
 
-public class Brick {
-
-    Brick() {
-
-    }
-
-}
+public class Brick { }
 
 public class Character {
 
