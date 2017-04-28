@@ -98,7 +98,13 @@ public class Field {
 
     private initBricks(int size) {
 
-        // init bricks
+        // TODO: randomize
+
+        // creates a horizontal wall of bricks in the middle
+        int middle = 3;
+        for (int i = 0; i < size; i++) {
+            this.board[middle][i] = 2; // brick
+        }
 
     }
 
