@@ -29,6 +29,7 @@ public class Field {
     // characters
     private Hero hero;
     private Enemy[] enemies;
+    private Brick[] bricks;
 
     Field(int size) {
 
@@ -96,14 +97,16 @@ public class Field {
 
     }
 
-    private initBricks(int size) {
+    private void initBricks(int size) {
 
         // TODO: randomize
 
         // creates a horizontal wall of bricks in the middle
         int middle = 3;
+        this.bricks = new Brick[size];
         for (int i = 0; i < size; i++) {
             this.board[middle][i] = 2; // brick
+            this.bricks[i] = new Brick(middle, i);
         }
 
     }
@@ -116,7 +119,16 @@ public class Block {
 }
 
 public class Brick {
-    // TODO
+
+    // position
+    private int x;
+    private int y;
+
+    Brick(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
 }
 
 public class Character {
