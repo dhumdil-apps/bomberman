@@ -6,25 +6,16 @@ public class Main {
          System.out.println("i'm fun at parties :D");
 
         // Init
-        Field f = new Field(5);
+        public Field f = new Field(5);
 
     }
 
 }
 
-/**
- * Block Legend:
- * 0 - empty space
- * 1 - wall
- * 2 - brick
- * 3 - hero
- * 4 - enemy
- * 5 - bomb
- */
 public class Field {
 
     // field
-    private int[][] board;
+    private Block[][] board;
     private int size;
     // characters
     private Hero hero;
@@ -41,10 +32,10 @@ public class Field {
      * Create Board
      * @param lvl
      */
+    // TODO: set dificulty based on lvl
     private void initBoard(int lvl) {
-        // TODO: set dificulty based on lvl
 
-        this.board = new int[size][size];
+        this.board = new Block[size][size];
 
         initWalls(this.size);
         initHero();
@@ -59,9 +50,9 @@ public class Field {
             for (int j = 0; j < size; j++) {
 
                 if (i % 2 && j % 2) {
-                    this.board[i][j] = 1; // wall
+                    this.board[i][j].type = 1;
                 } else {
-                    this.board[i][j] = 0; // empty space
+                    this.board[i][j].type = 0;
                 }
 
             }
@@ -75,7 +66,7 @@ public class Field {
         int x = 0; // top
         int y = 0; // left
 
-        this.board[x][y] = 3; // hero
+        this.board[x][y].type = 3; // hero
         this.hero = new Hero(x, y);
 
     }
@@ -91,7 +82,7 @@ public class Field {
             int randomX = this.size; // bottom
             int randomY = i; // left
 
-            this.board[randomX][randomY] = 4; // enemy
+            this.board[randomX][randomY].type = 4; // enemy
             this.enemies[i] = Enemy(randomX, randomY);
         }
 
@@ -105,28 +96,41 @@ public class Field {
         int middle = 3;
         this.bricks = new Brick[size];
         for (int i = 0; i < size; i++) {
-            this.board[middle][i] = 2; // brick
+            this.board[middle][i].type = 2; // brick
             this.bricks[i] = new Brick(middle, i);
         }
 
     }
 
+    public void placeBomb(int x, int y) {
+        this.board[x][y].type = 5;
+    }
+
 }
 
 public class Block {
-    // TODO: make every field (Bomb, Character, Brick, Wall, ...) a block
-    // TODO: store here the positions...
+
+    /**
+     * Types:
+     * 0 - empty space
+     * 1 - wall
+     * 2 - brick
+     * 3 - hero
+     * 4 - enemy
+     * 5 - bomb
+     */
+    public int type;
+
+    Block(int type) {
+        this.type = type;
+    }
+
 }
 
 public class Brick {
 
-    // position
-    private int x;
-    private int y;
+    Brick() {
 
-    Brick(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 
 }
@@ -142,6 +146,8 @@ public class Character {
         this.y = y;
     }
 
+    public void move() {}
+
 }
 
 public class Hero extends Character {
@@ -156,7 +162,10 @@ public class Hero extends Character {
         System.out.println("i'm a Hero!");
     }
 
+    public void placeBomb() { }
+
 }
+
 public class Enemy extends Character {
 
     Enemy(int x, int y) {
@@ -172,5 +181,8 @@ public class Enemy extends Character {
 }
 
 public class Bomb {
-    // TODO
+
+    private int range;
+    private int delay;
+
 }
