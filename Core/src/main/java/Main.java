@@ -28,14 +28,20 @@ public class Field {
     private int size;
     // characters
     private Hero hero;
+    private Enemy[] enemies;
 
     Field(int size) {
 
         this.size = size;
-        this.initBoard();
+        this.initBoard(0);
     }
 
-    private void initBoard() {
+    /**
+     * Create Board
+     * @param lvl
+     */
+    private void initBoard(int lvl) {
+        // TODO: set dificulty based on lvl
 
         this.board = new int[size][size];
 
@@ -52,12 +58,24 @@ public class Field {
         }
 
         // init hero on top-left corner
-        int x = 0;
-        int y = 0;
+        int x = 0; // top
+        int y = 0; // left
+
         this.board[x][y] = 3; // hero
         this.hero = new Hero(x, y);
 
-        // init enemies
+        // TODO: based on lvl
+        // TODO: randomize
+        // init 2 enemies on bottom-left corner
+        int numOfEnemies = 2;
+        this.enemies = new Enemy[numOfEnemies];
+        for (int i = 0; i < numOfEnemies; i++) {
+            int randomX = this.size; // bottom
+            int randomY = i; // left
+
+            this.board[randomX][randomY] = 4; // enemy
+            this.enemies[i] = Enemy(randomX, randomY);
+        }
 
         // init bricks
 
@@ -66,7 +84,7 @@ public class Field {
 }
 
 public class Brick {
-
+    // TODO
 }
 
 public class Character {
@@ -112,5 +130,5 @@ public class Enemy extends Character {
 
 
 public class Bomb {
-
+    // TODO
 }
