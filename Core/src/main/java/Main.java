@@ -45,8 +45,17 @@ public class Field {
 
         this.board = new int[size][size];
 
-        for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.size; j++) {
+        initWalls(this.size);
+        initHero();
+        initEnemies(lvl);
+        initBricks(this.size);
+
+    }
+
+    private void initWalls(int size) {
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
 
                 if (i % 2 && j % 2) {
                     this.board[i][j] = 1; // wall
@@ -57,12 +66,20 @@ public class Field {
             }
         }
 
+    }
+
+    private void initHero() {
+
         // init hero on top-left corner
         int x = 0; // top
         int y = 0; // left
 
         this.board[x][y] = 3; // hero
         this.hero = new Hero(x, y);
+
+    }
+
+    private void initEnemies(int lvl) {
 
         // TODO: based on lvl
         // TODO: randomize
@@ -77,10 +94,19 @@ public class Field {
             this.enemies[i] = Enemy(randomX, randomY);
         }
 
+    }
+
+    private initBricks(int size) {
+
         // init bricks
 
     }
 
+}
+
+public class Block {
+    // TODO: make every field (Bomb, Character, Brick, Wall, ...) a block
+    // TODO: store here the positions...
 }
 
 public class Brick {
@@ -113,7 +139,6 @@ public class Hero extends Character {
     }
 
 }
-
 public class Enemy extends Character {
 
     Enemy(int x, int y) {
@@ -127,7 +152,6 @@ public class Enemy extends Character {
     }
 
 }
-
 
 public class Bomb {
     // TODO
