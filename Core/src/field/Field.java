@@ -2,6 +2,8 @@ package field;
 
 import field.block.Block;
 import field.block.bomb.Bomb;
+import field.block.character.Character;
+import field.block.empty.Empty;
 import field.block.wall.Wall;
 import field.block.brick.Brick;
 import field.block.character.hero.Hero;
@@ -12,33 +14,26 @@ import field.block.character.enemy.Enemy;
  */
 public class Field {
 
-    // field
     private Block[][] board;
     private int size;
 
-    // characters
-    private Hero hero;
-    private Enemy[] enemies;
-
     public Field(int size) {
-
         this.size = size;
         this.initBoard();
-
     }
 
-    /**
-     * Create Board
-     */
-    // TODO: set dificulty based on lvl
+    // TODO: set difficulty based on lvl
     private void initBoard() {
 
         this.board = new Block[size][size];
 
-        initWalls();
-        initHero();
-        initEnemies();
-        initBricks();
+        this.initWalls();
+        this.initHero();
+        this.initEnemies();
+        this.initBricks();
+
+        // TODO:
+        // this.go();
 
     }
 
@@ -60,8 +55,8 @@ public class Field {
 
                 } else {
 
-                    // no walls
-                    this.board[i][j] = new Block();
+                    // empty block
+                    this.board[i][j] = new Empty(i, j);
 
                 }
 
@@ -132,6 +127,80 @@ public class Field {
 
             System.out.println();
         }
+
+    }
+
+    private void go() {
+
+        // simulate keyboard movement
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+
+                if (this.board[i][j] instanceof Hero) {
+                    move("right", i, j);
+                } else if (this.board[i][j] instanceof Enemy) {
+                    move("left", i, j);
+                }
+
+            }
+        }
+
+    }
+
+    // character movement
+    private void move(String direction, int i, int j) {
+
+        Block tmp1 = checkMove(direction, this.board[i][j]);
+        Block tmp2 = this.board[i][j];
+        this.board[i][j] = tmp1;
+        this.board[tmp1.x][tmp1.y] = tmp2;
+
+    }
+
+    private Block checkMove(String direction, Block character) {
+
+        switch (direction) {
+            case "up": {
+
+                // check if empty
+                if (this.board[character.x][character.y-1] instanceof Empty) {
+                    character.y--;
+                }
+
+                break;
+            }
+            case "down": {
+
+                // check if empty
+                if (this.board[character.x][character.y+1] instanceof Empty) {
+                    character.y++;
+                }
+
+                break;
+            }
+            case "right": {
+
+                // check if empty
+                if (this.board[character.x+1][character.y] instanceof Empty) {
+                    character.x++;
+                }
+
+                break;
+            }
+            case "left": {
+
+
+                // check if empty
+                if (this.board[character.x-1][character.y] instanceof Empty) {
+                    character.x--;
+                }
+
+                break;
+            }
+            default: break;
+        }
+
+        return character;
 
     }
 

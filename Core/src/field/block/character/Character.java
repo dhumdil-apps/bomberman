@@ -10,13 +10,9 @@ public class Character extends Block {
     public Character(int x, int y) {
 
         // init positions
-        this.setX(x);
-        this.setY(y);
+        this.x = x;
+        this.y = y;
 
-    }
-
-    public void move() {
-        // TODO
     }
 
 }
