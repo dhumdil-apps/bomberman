@@ -1,4 +1,8 @@
+package field.block;
 
+/**
+ * Block
+ */
 public class Block {
 
     /**
@@ -12,8 +16,9 @@ public class Block {
      */
     public int type;
 
-    Block(int type) {
+    public Block(int type) {
         this.type = type;
     }
 
 }
+
