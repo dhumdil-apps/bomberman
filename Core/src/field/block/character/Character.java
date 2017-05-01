@@ -1,19 +1,22 @@
 package field.block.character;
 
+import field.block.Block;
+
 /**
  * Character
  */
-public class Character {
-
-    // position
-    private int x;
-    private int y;
+public class Character extends Block {
 
     public Character(int x, int y) {
-        this.x = x;
-        this.y = y;
+
+        // init positions
+        this.setX(x);
+        this.setY(y);
+
     }
 
-    public void move() {}
+    public void move() {
+        // TODO
+    }
 
 }

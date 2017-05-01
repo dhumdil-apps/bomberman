@@ -1,24 +1,25 @@
 package field.block;
 
-/**
- * Block
- */
 public class Block {
 
-    /**
-     * Types:
-     * 0 - empty space
-     * 1 - wall
-     * 2 - brick
-     * 3 - hero
-     * 4 - enemy
-     * 5 - bomb
-     */
-    public int type;
+    // position
+    private int x;
+    private int y;
 
-    public Block(int type) {
-        this.type = type;
+    protected void setX(int x) {
+        this.x = x;
+    }
+
+    protected void setY(int y) {
+        this.y = y;
+    }
+
+    protected int getX() {
+        return this.x;
+    }
+
+    protected int getY() {
+        return this.y;
     }
 
 }
-
