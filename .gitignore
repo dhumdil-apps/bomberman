@@ -1,6 +1,8 @@
+# IDE
 /.idea
-target
-build
+
+# build
+/out
+
+# project
 *.iml
-.project
-.settings
