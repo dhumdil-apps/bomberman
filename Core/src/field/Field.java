@@ -103,7 +103,6 @@ public class Field {
 
     }
 
-    // TODO: use Bomb()
     public void placeBomb(int x, int y) {
         this.board[x][y] = new Bomb(x, y);
     }
