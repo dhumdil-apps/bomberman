@@ -2,7 +2,6 @@ package field;
 
 import field.block.Block;
 import field.block.bomb.Bomb;
-import field.block.character.Character;
 import field.block.empty.Empty;
 import field.block.wall.Wall;
 import field.block.brick.Brick;
@@ -32,8 +31,11 @@ public class Field {
         this.initEnemies();
         this.initBricks();
 
-        // TODO:
-        // this.go();
+        this.printField();
+
+        this.start();
+
+        this.printField();
 
     }
 
@@ -103,7 +105,7 @@ public class Field {
     }
 
     // method for visualization
-    public void printField() {
+    private void printField() {
 
         for (int i = 0; i < this.size; i++) {
 
@@ -127,72 +129,78 @@ public class Field {
 
             System.out.println();
         }
+        System.out.println();
+        System.out.println();
 
     }
 
-    private void go() {
+    // listen for keyboard events
+    private void start() {
 
-        // simulate keyboard movement
-        for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.size; j++) {
+        // simulate movement of enemy
+        // this.move("top", this.size - 2, this.size - 2);
 
-                if (this.board[i][j] instanceof Hero) {
-                    move("right", i, j);
-                } else if (this.board[i][j] instanceof Enemy) {
-                    move("left", i, j);
-                }
-
-            }
-        }
+         // simulate movement of hero
+         this.move("right", 1, 1);
 
     }
 
     // character movement
     private void move(String direction, int i, int j) {
 
-        Block tmp1 = checkMove(direction, this.board[i][j]);
-        Block tmp2 = this.board[i][j];
-        this.board[i][j] = tmp1;
-        this.board[tmp1.x][tmp1.y] = tmp2;
+        // validate move and store the new position
+        Block character = validateMove(direction, this.board[i][j]);
+        final int x = character.x;
+        final int y = character.y;
+
+        // if the position was updated
+        if (x != j || y != j) {
+
+            // swap content using a temporary variable
+            // (i,j) <=> (x,y)
+            final Block tmp = this.board[i][j];
+            this.board[i][j] = this.board[x][y];
+            this.board[x][y] = tmp;
+
+        }
 
     }
 
-    private Block checkMove(String direction, Block character) {
+    // check if valid
+    private Block validateMove(String direction, Block character) {
+
+        // System.out.println("x: " + character.x);
+        // System.out.println("y: " + character.y);
 
         switch (direction) {
-            case "up": {
+            case "down": {
 
-                // check if empty
-                if (this.board[character.x][character.y-1] instanceof Empty) {
-                    character.y--;
+                if (this.board[character.x + 1][character.y] instanceof Empty) {
+                    character.x = character.x + 1;
                 }
 
                 break;
             }
-            case "down": {
+            case "up": {
 
-                // check if empty
-                if (this.board[character.x][character.y+1] instanceof Empty) {
-                    character.y++;
+                if (this.board[character.x - 1][character.y] instanceof Empty) {
+                    character.x = character.x - 1;
                 }
 
                 break;
             }
             case "right": {
 
-                // check if empty
-                if (this.board[character.x+1][character.y] instanceof Empty) {
-                    character.x++;
+                if (this.board[character.x][character.y + 1] instanceof Empty) {
+                    character.y = character.y + 1;
                 }
 
                 break;
             }
             case "left": {
 
-
-                // check if empty
-                if (this.board[character.x-1][character.y] instanceof Empty) {
-                    character.x--;
+                if (this.board[character.x][character.y - 1] instanceof Empty) {
+                    character.y = character.y - 1;
                 }
 
                 break;
