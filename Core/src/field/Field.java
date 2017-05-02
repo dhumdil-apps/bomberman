@@ -27,13 +27,16 @@ public class Field {
     private List<Block> wallBlocks;
     private List<Block> emptyBlocks;
 
-    public Field(int size) {
+    private Random randomGenerator;
+
+    public Field(int size, int lvl) {
 
         this.size = (size * 2) + 3;
         this.countBlocks = (size * (size + 1)) + ((size + 1) * (this.size - 2));
-        this.countEnemies = 2;
-        this.countWalls = 3;
+        this.countEnemies = lvl;
+        this.countWalls = ((this.countBlocks - 9) > 0) ? (this.countBlocks - this.countEnemies - 9)/2 : 0;
 
+        this.randomGenerator = new Random();
         this.board = new Block[this.size][this.size];
         this.emptyBlocks = new ArrayList<Block>(this.countBlocks);
         this.enemies = new ArrayList<Block>(this.countEnemies);
@@ -43,60 +46,61 @@ public class Field {
 
     }
 
-    // TODO: optimize!
     private void init() {
 
-        Random randomGenerator = new Random();
-        int randomNumber;
         Block block;
 
-        // place borders
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                this.board[i][j] = this.isBorder(i, j) ? new BorderBlock(i, j) : new EmptyBlock(i, j);
-            }
-        }
 
-        // store empty blocks
-        for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.size; j++) {
-                if (this.board[i][j] instanceof EmptyBlock) {
+                if (this.isBorder(i, j)) {
+
+                    // borders:
+                    this.board[i][j] = new BorderBlock(i, j);
+
+                } else if (i > 2 || j > 2) {
+
+                    // empty-blocks:
+                    this.board[i][j] = new EmptyBlock(i, j);
                     this.emptyBlocks.add(this.board[i][j]);
+
                 }
+
             }
         }
 
         // hero:
-        randomNumber = randomGenerator.nextInt(this.emptyBlocks.size());
-        block = this.emptyBlocks.get(randomNumber);
-        this.emptyBlocks.remove(randomNumber);
-        this.hero = new Hero(block.x, block.y);
-        this.board[block.x][block.y] = this.hero;
+        this.board[1][1] = new Hero(1,1);
+        this.board[1][2] = new Block();
+        this.board[2][1] = new Block();
+        this.hero = this.board[1][1];
 
         // enemies:
         for (int i = 0; i < this.countEnemies; i++) {
 
-            randomNumber = randomGenerator.nextInt(this.emptyBlocks.size());
-            block = this.emptyBlocks.get(randomNumber);
-            this.emptyBlocks.remove(randomNumber);
-            this.enemies.add(new Enemy(block.x, block.y));
-            this.board[block.x][block.y] = this.enemies.get(i);
+            block = this.getRandomEmptyBlock();
+            this.board[block.x][block.y] = new Enemy(block.x, block.y);
+            this.enemies.add(this.board[block.x][block.y]);
 
         }
 
-        // walls:
+        // wall-blocks:
         for (int i = 0; i < this.countWalls; i++) {
 
-            randomNumber = randomGenerator.nextInt(this.emptyBlocks.size());
-            block = this.emptyBlocks.get(randomNumber);
-            this.emptyBlocks.remove(randomNumber);
-            this.wallBlocks.add(new WallBlock(block.x, block.y));
-            this.board[block.x][block.y] = this.wallBlocks.get(i);
+            block = this.getRandomEmptyBlock();
+            this.board[block.x][block.y] = new WallBlock(block.x, block.y);
+            this.wallBlocks.add(this.board[block.x][block.y]);
 
         }
 
+        // keep empty around hero position:
+        this.board[1][2] = new EmptyBlock(1, 2);
+        this.emptyBlocks.add(this.board[1][2]);
+        this.board[2][1] = new EmptyBlock(2, 1);
+        this.emptyBlocks.add(this.board[2][1]);
+
+        // visualize the board
         this.printField();
-        // this.start();
 
     }
 
@@ -108,17 +112,17 @@ public class Field {
             for (int j = 0; j < this.size; j++) {
 
                 if (this.board[i][j] instanceof BorderBlock) {
-                    System.out.print( "\t#" );
+                    System.out.print( " #" );
                 } else if (this.board[i][j] instanceof WallBlock) {
-                    System.out.print( "\t+" );
+                    System.out.print( " ." );
                 } else if (this.board[i][j] instanceof Hero) {
-                    System.out.print( "\tH" );
+                    System.out.print( " H" );
                 } else if (this.board[i][j] instanceof Enemy) {
-                    System.out.print( "\tE" );
+                    System.out.print( " E" );
                 } else if (this.board[i][j] instanceof Bomb) {
-                    System.out.print( "\tB" );
+                    System.out.print( " B" );
                 } else {
-                    System.out.print( "\t." );
+                    System.out.print( "  " );
                 }
 
             }
@@ -130,19 +134,8 @@ public class Field {
 
     }
 
-    // listen for keyboard events
-    private void start() {
-
-        // simulate movement of enemy (he's position being (size-2, size-2))
-        this.move("up", this.size - 2, this.size - 2);
-
-        // simulate movement of hero (he's position being (1,1))
-        this.move("right", 1, 1);
-
-    }
-
     // character movement
-    private void move(String direction, int i, int j) {
+    public void move(String direction, int i, int j) {
 
         // validate move and store the new position
         Block character = validateMove(direction, this.board[i][j]);
@@ -203,11 +196,27 @@ public class Field {
     }
 
     // HELPERS
+
     private boolean isEmpty(int i, int j) {
         return (this.board[i][j] instanceof EmptyBlock);
     }
+    private boolean isWall(int i, int j) {
+        return (this.board[i][j] instanceof WallBlock);
+    }
+
     private boolean isBorder(int i, int j) {
         return ( (i%2 == 0) && (j%2 == 0) || (i == 0 || j == 0 || i == this.size - 1 || j == this.size - 1) );
+    }
+
+    private int randomize(int max) {
+        return this.randomGenerator.nextInt(max);
+    }
+
+    private Block getRandomEmptyBlock() {
+        int randomNumber = this.randomize(this.emptyBlocks.size());
+        Block block = this.emptyBlocks.get(randomNumber);
+        this.emptyBlocks.remove(randomNumber);
+        return block;
     }
 
 }
