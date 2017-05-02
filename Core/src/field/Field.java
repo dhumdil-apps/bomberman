@@ -1,5 +1,10 @@
 package field;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.List;
+
+// local
 import field.block.Block;
 import field.block.bomb.Bomb;
 import field.block.border.BorderBlock;
@@ -8,98 +13,91 @@ import field.block.wall.WallBlock;
 import field.block.character.hero.Hero;
 import field.block.character.enemy.Enemy;
 
-/**
- * Field
- */
 public class Field {
 
     private Block[][] board;
     private int size;
 
+    private int countBlocks;
+    private int countEnemies;
+    private int countWalls;
+
+    private Block hero;
+    private List<Block> enemies;
+    private List<Block> wallBlocks;
+    private List<Block> emptyBlocks;
+
     public Field(int size) {
-        this.size = size;
-        this.initBoard();
-    }
 
-    // TODO: set difficulty based on lvl
-    private void initBoard() {
+        this.size = (size * 2) + 3;
+        this.countBlocks = (size * (size + 1)) + ((size + 1) * (this.size - 2));
+        this.countEnemies = 2;
+        this.countWalls = 3;
 
-        this.board = new Block[size][size];
+        this.board = new Block[this.size][this.size];
+        this.emptyBlocks = new ArrayList<Block>(this.countBlocks);
+        this.enemies = new ArrayList<Block>(this.countEnemies);
+        this.wallBlocks = new ArrayList<Block>(this.countWalls);
 
-        this.initWalls();
-        this.initHero();
-        this.initEnemies();
-        this.initBricks();
-
-        // visualize...
-        this.printField();
-        this.start();
-        this.printField();
+        this.init();
 
     }
 
-    // create borders and walls
-    private void initWalls() {
+    // TODO: optimize!
+    private void init() {
 
+        Random randomGenerator = new Random();
+        int randomNumber;
+        Block block;
+
+        // place borders
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-
-                if ((i%2 == 0) && (j%2 == 0)) {
-
-                    // walls inside board
-                    this.board[i][j] = new BorderBlock(i, j);
-
-                } else if (i == 0 || j == 0 || i == this.size - 1 || j == this.size - 1) {
-
-                    // border walls
-                    this.board[i][j] = new BorderBlock(i, j);
-
-                } else {
-
-                    // EmptyBlock block
-                    this.board[i][j] = new EmptyBlock(i, j);
-
-                }
-
+                this.board[i][j] = this.isBorder(i, j) ? new BorderBlock(i, j) : new EmptyBlock(i, j);
             }
         }
 
-    }
+        // store empty blocks
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                if (this.board[i][j] instanceof EmptyBlock) {
+                    this.emptyBlocks.add(this.board[i][j]);
+                }
+            }
+        }
 
-    // place the hero on top-left corner
-    private void initHero() {
+        // hero:
+        randomNumber = randomGenerator.nextInt(this.emptyBlocks.size());
+        block = this.emptyBlocks.get(randomNumber);
+        this.emptyBlocks.remove(randomNumber);
+        this.hero = new Hero(block.x, block.y);
+        this.board[block.x][block.y] = this.hero;
 
-        final int x = 1; // top
-        final int y = 1; // left
+        // enemies:
+        for (int i = 0; i < this.countEnemies; i++) {
 
-        this.board[x][y] = new Hero(x, y);
+            randomNumber = randomGenerator.nextInt(this.emptyBlocks.size());
+            block = this.emptyBlocks.get(randomNumber);
+            this.emptyBlocks.remove(randomNumber);
+            this.enemies.add(new Enemy(block.x, block.y));
+            this.board[block.x][block.y] = this.enemies.get(i);
 
-    }
+        }
 
-    // place one enemy on bottom-right corner
-    // TODO: (change numberOf & typeOf) based on lvl & randomize position
-    private void initEnemies() {
+        // walls:
+        for (int i = 0; i < this.countWalls; i++) {
 
-        final int x = this.size - 2; // bottom
-        final int y = this.size - 2; // right
+            randomNumber = randomGenerator.nextInt(this.emptyBlocks.size());
+            block = this.emptyBlocks.get(randomNumber);
+            this.emptyBlocks.remove(randomNumber);
+            this.wallBlocks.add(new WallBlock(block.x, block.y));
+            this.board[block.x][block.y] = this.wallBlocks.get(i);
 
-        this.board[x][y] = new Enemy(x, y);
+        }
 
-    }
+        this.printField();
+        // this.start();
 
-    // creates a horizontal border of bricks in the middle of the board
-    // TODO: randomize positions
-    private void initBricks() {
-
-        // static border of bricks...
-        this.board[5][1] = new WallBlock(5, 1);
-        this.board[3][3] = new WallBlock(3, 3);
-        this.board[1][5] = new WallBlock(1, 5);
-
-    }
-
-    public void placeBomb(int x, int y) {
-        this.board[x][y] = new Bomb(x, y);
     }
 
     // method for visualization
@@ -169,41 +167,47 @@ public class Field {
         switch (direction) {
             case "down": {
 
-                if (this.board[character.x + 1][character.y] instanceof EmptyBlock) {
+                if (this.isEmpty(character.x+1, character.y)) {
                     character.x = character.x + 1;
                 }
 
-                break;
+                return character;
             }
             case "up": {
 
-                if (this.board[character.x - 1][character.y] instanceof EmptyBlock) {
+                if (this.isEmpty(character.x-1, character.y)) {
                     character.x = character.x - 1;
                 }
 
-                break;
+                return character;
             }
             case "right": {
 
-                if (this.board[character.x][character.y + 1] instanceof EmptyBlock) {
+                if (this.isEmpty(character.x, character.y+1)) {
                     character.y = character.y + 1;
                 }
 
-                break;
+                return character;
             }
             case "left": {
 
-                if (this.board[character.x][character.y - 1] instanceof EmptyBlock) {
+                if (this.isEmpty(character.x, character.y-1)) {
                     character.y = character.y - 1;
                 }
 
-                break;
+                return character;
             }
-            default: break;
+            default: return character;
         }
 
-        return character;
+    }
 
+    // HELPERS
+    private boolean isEmpty(int i, int j) {
+        return (this.board[i][j] instanceof EmptyBlock);
+    }
+    private boolean isBorder(int i, int j) {
+        return ( (i%2 == 0) && (j%2 == 0) || (i == 0 || j == 0 || i == this.size - 1 || j == this.size - 1) );
     }
 
 }
