@@ -2,9 +2,9 @@ package field;
 
 import field.block.Block;
 import field.block.bomb.Bomb;
-import field.block.empty.Empty;
-import field.block.wall.Wall;
-import field.block.brick.Brick;
+import field.block.border.BorderBlock;
+import field.block.empty.EmptyBlock;
+import field.block.wall.WallBlock;
 import field.block.character.hero.Hero;
 import field.block.character.enemy.Enemy;
 
@@ -47,17 +47,17 @@ public class Field {
                 if ((i%2 == 0) && (j%2 == 0)) {
 
                     // walls inside board
-                    this.board[i][j] = new Wall(i, j);
+                    this.board[i][j] = new BorderBlock(i, j);
 
                 } else if (i == 0 || j == 0 || i == this.size - 1 || j == this.size - 1) {
 
                     // border walls
-                    this.board[i][j] = new Wall(i, j);
+                    this.board[i][j] = new BorderBlock(i, j);
 
                 } else {
 
-                    // empty block
-                    this.board[i][j] = new Empty(i, j);
+                    // EmptyBlock block
+                    this.board[i][j] = new EmptyBlock(i, j);
 
                 }
 
@@ -87,15 +87,14 @@ public class Field {
 
     }
 
-    // creates a horizontal wall of bricks
-    // in the middle of the board
+    // creates a horizontal border of bricks in the middle of the board
     // TODO: randomize positions
     private void initBricks() {
 
-        final int middle = 3;
-        for (int i = 1; i < this.size - 1; i++) {
-            this.board[middle][i] = new Brick(middle, i);
-        }
+        // static border of bricks...
+        this.board[5][1] = new WallBlock(5, 1);
+        this.board[3][3] = new WallBlock(3, 3);
+        this.board[1][5] = new WallBlock(1, 5);
 
     }
 
@@ -110,9 +109,9 @@ public class Field {
 
             for (int j = 0; j < this.size; j++) {
 
-                if (this.board[i][j] instanceof Wall) {
+                if (this.board[i][j] instanceof BorderBlock) {
                     System.out.print( "\t#" );
-                } else if (this.board[i][j] instanceof Brick) {
+                } else if (this.board[i][j] instanceof WallBlock) {
                     System.out.print( "\t+" );
                 } else if (this.board[i][j] instanceof Hero) {
                     System.out.print( "\tH" );
@@ -153,10 +152,9 @@ public class Field {
         final int y = character.y;
 
         // if the position was updated
-        if (x != j || y != j) {
+        if (x != i || y != j) {
 
-            // swap content using a temporary variable
-            // (i,j) <=> (x,y)
+            // swap content using a temporary variable -> (i,j) <=> (x,y)
             final Block tmp = this.board[i][j];
             this.board[i][j] = this.board[x][y];
             this.board[x][y] = tmp;
@@ -168,13 +166,10 @@ public class Field {
     // check if valid
     private Block validateMove(String direction, Block character) {
 
-        // System.out.println("x: " + character.x);
-        // System.out.println("y: " + character.y);
-
         switch (direction) {
             case "down": {
 
-                if (this.board[character.x + 1][character.y] instanceof Empty) {
+                if (this.board[character.x + 1][character.y] instanceof EmptyBlock) {
                     character.x = character.x + 1;
                 }
 
@@ -182,7 +177,7 @@ public class Field {
             }
             case "up": {
 
-                if (this.board[character.x - 1][character.y] instanceof Empty) {
+                if (this.board[character.x - 1][character.y] instanceof EmptyBlock) {
                     character.x = character.x - 1;
                 }
 
@@ -190,7 +185,7 @@ public class Field {
             }
             case "right": {
 
-                if (this.board[character.x][character.y + 1] instanceof Empty) {
+                if (this.board[character.x][character.y + 1] instanceof EmptyBlock) {
                     character.y = character.y + 1;
                 }
 
@@ -198,7 +193,7 @@ public class Field {
             }
             case "left": {
 
-                if (this.board[character.x][character.y - 1] instanceof Empty) {
+                if (this.board[character.x][character.y - 1] instanceof EmptyBlock) {
                     character.y = character.y - 1;
                 }
 

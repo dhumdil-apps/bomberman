@@ -3,11 +3,11 @@ package field.block.wall;
 import field.block.Block;
 
 /**
- * Wall
+ * Bomb
  */
-public class Wall extends Block {
+public class WallBlock extends Block {
 
-    public Wall(int x, int y) {
+    public WallBlock(int x, int y) {
         this.x = x;
         this.y = y;
     }

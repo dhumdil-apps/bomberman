@@ -3,11 +3,11 @@ package field.block.empty;
 import field.block.Block;
 
 /**
- * Wall
+ * BorderBlock
  */
-public class Empty extends Block {
+public class EmptyBlock extends Block {
 
-    public Empty(int x, int y) {
+    public EmptyBlock(int x, int y) {
         this.x = x;
         this.y = y;
     }
