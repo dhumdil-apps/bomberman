@@ -31,10 +31,9 @@ public class Field {
         this.initEnemies();
         this.initBricks();
 
+        // visualize...
         this.printField();
-
         this.start();
-
         this.printField();
 
     }
@@ -137,11 +136,11 @@ public class Field {
     // listen for keyboard events
     private void start() {
 
-        // simulate movement of enemy
-        // this.move("top", this.size - 2, this.size - 2);
+        // simulate movement of enemy (he's position being (size-2, size-2))
+        this.move("up", this.size - 2, this.size - 2);
 
-         // simulate movement of hero
-         this.move("right", 1, 1);
+        // simulate movement of hero (he's position being (1,1))
+        this.move("right", 1, 1);
 
     }
 
