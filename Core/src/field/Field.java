@@ -15,18 +15,15 @@ import field.block.character.enemy.Enemy;
 
 public class Field {
 
-    private Block[][] board;
+    public Block[][] board;
     private int size;
-
     private int countBlocks;
     private int countEnemies;
     private int countWalls;
-
-    private Block hero;
-    private List<Block> enemies;
-    private List<Block> wallBlocks;
-    private List<Block> emptyBlocks;
-
+    public Block hero;
+    public List<Block> enemies;
+    public List<Block> wallBlocks;
+    public List<Block> emptyBlocks;
     private Random randomGenerator;
 
     public Field(int size, int lvl) {
@@ -99,13 +96,11 @@ public class Field {
         this.board[2][1] = new EmptyBlock(2, 1);
         this.emptyBlocks.add(this.board[2][1]);
 
-        // visualize the board
-        this.printField();
-
     }
 
-    // method for visualization
-    private void printField() {
+    // visualization
+
+    public void printField() {
 
         for (int i = 0; i < this.size; i++) {
 
@@ -134,7 +129,8 @@ public class Field {
 
     }
 
-    // character movement
+    // movement
+
     public void move(String direction, int i, int j) {
 
         // validate move and store the new position
@@ -154,7 +150,6 @@ public class Field {
 
     }
 
-    // check if valid
     private Block validateMove(String direction, Block character) {
 
         switch (direction) {
@@ -195,13 +190,10 @@ public class Field {
 
     }
 
-    // HELPERS
+    // helpers
 
     private boolean isEmpty(int i, int j) {
         return (this.board[i][j] instanceof EmptyBlock);
-    }
-    private boolean isWall(int i, int j) {
-        return (this.board[i][j] instanceof WallBlock);
     }
 
     private boolean isBorder(int i, int j) {

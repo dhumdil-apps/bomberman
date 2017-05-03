@@ -1,5 +1,8 @@
 import field.Field;
 
+import java.util.Scanner;
+
+
 public class Main {
 
     public static void main(String[] args) {
@@ -8,6 +11,48 @@ public class Main {
         final int lvl = selectLevel("insane");
 
         Field field = new Field(size, lvl);
+        Scanner cin = new Scanner(System.in);
+
+        field.printField();
+
+        // cli demo:
+        while (true) {
+
+            System.out.println("q: exit");
+            System.out.println("h: left");
+            System.out.println("j: down");
+            System.out.println("k: up");
+            System.out.println("l: right");
+
+            String input = cin.next();
+
+            if (input.equals("q")) {
+                break;
+            } else {
+
+                switch (input) {
+                    case "h":
+                        field.move("left", field.hero.x, field.hero.y);
+                        break;
+                    case "j":
+                        field.move("down", field.hero.x, field.hero.y);
+                        break;
+                    case "k":
+                        field.move("up", field.hero.x, field.hero.y);
+                        break;
+                    case "l":
+                        field.move("right", field.hero.x, field.hero.y);
+                        break;
+                    default:
+                        System.out.println("Try again!");
+                }
+
+                field.printField();
+
+            }
+
+
+        }
 
     }
 
