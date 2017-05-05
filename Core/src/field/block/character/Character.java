@@ -3,11 +3,11 @@ package field.block.character;
 import field.block.Block;
 
 /**
- * CharacterBlock
+ * Character
  */
-public class CharacterBlock extends Block {
+public class Character extends Block {
 
-    public CharacterBlock(int x, int y) {
+    public Character(int x, int y) {
 
         // init positions
         this.x = x;

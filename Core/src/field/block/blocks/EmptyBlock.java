@@ -1,9 +1,9 @@
-package field.block.empty;
+package field.block.blocks;
 
 import field.block.Block;
 
 /**
- * BorderBlock
+ * Border
  */
 public class EmptyBlock extends Block {
 

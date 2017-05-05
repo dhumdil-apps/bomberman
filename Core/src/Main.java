@@ -1,56 +1,67 @@
+import field.block.Block;
 import field.Field;
 
 import java.util.Scanner;
-
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        final int size = selectSize("xlg");
-        final int lvl = selectLevel("insane");
+        int size = selectSize("xlg");
+        int lvl = selectLevel("insane");
+        int countEnemies = lvl * 2;
+        int countBlocks = (size * (size + 1)) + ((size + 1) * (((size * 2) + 3) - 2));
+        int countWalls = ((countBlocks - 9) > 0) ? (countBlocks - countEnemies - 9)/2 : 0;
+        size = (size * 2) + 3;
 
-        Field field = new Field(size, lvl);
-        Scanner cin = new Scanner(System.in);
+        // init board
+        Field field = new Field(size, countBlocks);
+
+        // init enemies
+        ArrayList<Block> enemies = field.initEnemies(countEnemies);
+
+        // init walls
+        field.initWalls(countWalls);
+
+        // init hero
+        Block hero = field.initHero();
 
         field.printField();
 
         // cli demo:
+        Scanner cin = new Scanner(System.in);
+        String direction;
         while (true) {
 
-            System.out.println("q: exit");
-            System.out.println("h: left");
-            System.out.println("j: down");
-            System.out.println("k: up");
-            System.out.println("l: right");
+            // print instructions
+            System.out.println("q: quit");
+            System.out.println("w: up");
+            System.out.println("a: left");
+            System.out.println("s: down");
+            System.out.println("d: right");
 
-            String input = cin.next();
+            // get input
+            direction = selectDirection(cin.next());
 
-            if (input.equals("q")) {
-                break;
-            } else {
-
-                switch (input) {
-                    case "h":
-                        field.move("left", field.hero.x, field.hero.y);
-                        break;
-                    case "j":
-                        field.move("down", field.hero.x, field.hero.y);
-                        break;
-                    case "k":
-                        field.move("up", field.hero.x, field.hero.y);
-                        break;
-                    case "l":
-                        field.move("right", field.hero.x, field.hero.y);
-                        break;
-                    default:
-                        System.out.println("Try again!");
-                }
-
-                field.printField();
-
+            // validate input
+            if (direction.equals("")) {
+                System.out.println("Input error, try again:");
+                continue;
             }
 
+            // check if the game is over
+            if (direction.equals("q")) {
+                System.out.println("Quitting...");
+                break;
+            }
+
+            // execute hero & enemies movement
+            hero = field.moveHero(direction, hero);
+            // field.moveEnemies(enemies);
+
+            // print updated board
+            field.printField();
 
         }
 
@@ -79,6 +90,19 @@ public class Main {
             case "hard": return 3;
             case "insane": return 4;
             default: return 2;
+        }
+
+    }
+
+    private static String selectDirection(String input) {
+
+        switch (input) {
+            case "w": return "up";
+            case "a": return "left";
+            case "s": return "down";
+            case "d": return "right";
+            case "q": return "q";
+            default: return "";
         }
 
     }
