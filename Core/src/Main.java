@@ -56,9 +56,12 @@ public class Main {
                 break;
             }
 
-            // execute hero & enemies movement
+            // execute hero movement
             hero = field.moveHero(direction, hero);
-            // field.moveEnemies(enemies);
+            if (hero.x == 0 && hero.y == 0) {
+                System.out.println("Game Over!");
+                break;
+            }
 
             // print updated board
             field.printField();

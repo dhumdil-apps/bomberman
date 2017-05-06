@@ -60,7 +60,8 @@ public class Field {
 
     }
 
-    // initialization
+    // initialize
+
     public ArrayList<Block> initEnemies(int countEnemies) {
 
         Block block;
@@ -76,7 +77,6 @@ public class Field {
 
     }
 
-    // initialization
     public void initWalls(int countWalls) {
 
         Block block;
@@ -88,7 +88,6 @@ public class Field {
 
     }
 
-    // initialization
     public Block initHero() {
 
         Block hero = new Hero(1, 1);
@@ -101,7 +100,8 @@ public class Field {
 
     }
 
-    // visualization
+    // visualize
+
     public void printField() {
 
         for (int i = 0; i < this.size; i++) {
@@ -135,15 +135,38 @@ public class Field {
     public Block moveHero(String direction, Block hero) {
 
         Block character = new Hero(hero.x, hero.y);
-        validateMove(direction, character);
+        final boolean isHero = true;
+        boolean gameOver = validateMove(direction, character, isHero);
 
-        boolean moved = this.move(hero, character);
+        if (!gameOver) {
 
-        return character;
+            // previous
+            final int i = hero.x;
+            final int j = hero.y;
+
+            // new
+            final int x = character.x;
+            final int y = character.y;
+
+            // if the position was updated -> swap content
+            if (x != i || y != j) {
+
+                final Block tmp = this.board[i][j];
+                this.board[i][j] = this.board[x][y];
+                this.board[x][y] = tmp;
+
+            }
+
+            return character;
+
+        }
+
+        // TODO: use a method instead...
+        return new Hero(0,0);
 
     }
 
-    // movement
+/*
     public ArrayList<Block> moveEnemies(ArrayList<Block> enemies) {
 
         // TODO:
@@ -157,82 +180,79 @@ public class Field {
         return enemies;
 
     }
+*/
 
-    // movement
-    private boolean move(Block previousPosition, Block newPosition) {
-
-        // previous
-        final int i = previousPosition.x;
-        final int j = previousPosition.y;
-
-        // new
-        final int x = newPosition.x;
-        final int y = newPosition.y;
-
-        // if the position was updated -> swap content
-        if (x != i || y != j) {
-
-            final Block tmp = this.board[i][j];
-            this.board[i][j] = this.board[x][y];
-            this.board[x][y] = tmp;
-
-            return true;
-        }
-
-        return false;
-
-    }
-
-    // movement
-    private void validateMove(String direction, Block character) {
+    // validate movement
+    private boolean validateMove(String direction, Block character, boolean isHero) {
 
         switch (direction) {
             case "down": {
 
+                // valid move
                 if (this.isEmpty(character.x+1, character.y)) {
                     character.x = character.x + 1;
+                    return false;
                 }
 
-                break;
+                return (this.isEnemy(character.x+1, character.y) && isHero);
+
             }
             case "up": {
 
+                // valid move
                 if (this.isEmpty(character.x-1, character.y)) {
                     character.x = character.x - 1;
+                    return false;
                 }
 
-                break;
+                return (this.isEnemy(character.x-1, character.y) && isHero);
+
             }
             case "right": {
 
+                // valid move
                 if (this.isEmpty(character.x, character.y+1)) {
                     character.y = character.y + 1;
+                    return false;
                 }
 
-                break;
+                return (this.isEnemy(character.x, character.y+1) && isHero);
+
             }
             case "left": {
 
+                // valid move
                 if (this.isEmpty(character.x, character.y-1)) {
                     character.y = character.y - 1;
+                    return false;
                 }
 
-                break;
+                // game over
+                return (this.isEnemy(character.x, character.y-1) && isHero);
+
             }
             default: break;
+
         }
+        
+        return false;
 
     }
 
-    // helper
+    // helpers
+
     private boolean isEmpty(int i, int j) {
 
-        boolean isInstance = (this.board[i][j] instanceof EmptyBlock);
-        return isInstance;
+        return (this.board[i][j] instanceof EmptyBlock);
 
     }
 
-    // helper
+    private boolean isEnemy(int i, int j) {
+
+        return  (this.board[i][j] instanceof Enemy);
+
+    }
+
     private boolean isBorder(int i, int j) {
 
         boolean isOuterBorder = (i == 0 || j == 0 || i == this.size - 1 || j == this.size - 1);
@@ -242,20 +262,22 @@ public class Field {
 
     }
 
-    // helper
     private int randomize(int max) {
 
-        // get random number
+        // return random number
         return this.randomGenerator.nextInt(max);
 
     }
 
-    // helper
     private Block getRandomEmptyBlock() {
+
+        // random pick of empty block
         int randomNumber = this.randomize(this.emptyBlocks.size());
         Block block = this.emptyBlocks.get(randomNumber);
         this.emptyBlocks.remove(randomNumber);
+
         return block;
+
     }
 
 }
