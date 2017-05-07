@@ -138,57 +138,55 @@ public class Field {
     }
 
     // movement
-    public Block moveHero(String direction, Block hero) {
+    public void moveHero(String direction, Block hero) {
 
         Block character = new Hero(hero.x, hero.y);
         validateMove(direction, character, true);
 
-        if (!this.gameOver) {
+        if (this.isValid) {
 
-            // previous
-            final int i = hero.x;
-            final int j = hero.y;
+            // swap content
+            final Block tmp = this.board[hero.x][hero.y];
+            this.board[hero.x][hero.y] = this.board[character.x][character.y];
+            this.board[character.x][character.y] = tmp;
 
-            // new
-            final int x = character.x;
-            final int y = character.y;
-
-            // if the position was updated -> swap content
-            if (x != i || y != j) {
-
-                final Block tmp = this.board[i][j];
-                this.board[i][j] = this.board[x][y];
-                this.board[x][y] = tmp;
-
-            }
-
-            return character;
+            // update hero
+            hero.x = character.x;
+            hero.y = character.y;
 
         }
-
-        return hero;
 
     }
 
     // movement
     public void moveEnemies(ArrayList<Block> enemies) {
 
+        String direction;
+        Block character;
+        int random;
+
         for (Block enemy: enemies) {
 
-            Block character = new Enemy(enemy.x, enemy.y);
-
+            // reinitialize
+            character = new Enemy(enemy.x, enemy.y);
             ArrayList<String> directions = new ArrayList<>();
+
+            // list of directions
             directions.add("up");
             directions.add("right");
             directions.add("down");
             directions.add("left");
 
-            String direction;
-            int random = this.randomize(directions.size());
+            // randomize direction
+            random = this.randomize(directions.size());
 
             // validate move
-            this.isValid = true;
             this.validateMove(directions.get(random), character, false);
+
+            // game over
+            if (this.gameOver) {
+                break;
+            }
 
             // if the random directions isn't valid,
             // then try to use the rest of possible directions
@@ -209,35 +207,27 @@ public class Field {
                 character.y = enemy.y;
 
                 // validate move
-                this.isValid = true;
                 this.validateMove(direction, character, false);
 
+                // game over
+                if (this.gameOver) {
+                    break;
+                }
+                
             }
 
             if (this.isValid) {
-                System.out.println("direction: " + directions.get(random));
-            }
 
-            // previous
-            final int i = enemy.x;
-            final int j = enemy.y;
+                // swap content
+                final Block tmp = this.board[enemy.x][enemy.y];
+                this.board[enemy.x][enemy.y] = this.board[character.x][character.y];
+                this.board[character.x][character.y] = tmp;
 
-            // new
-            final int x = character.x;
-            final int y = character.y;
-
-            // if the position was updated -> swap content
-            if (x != i || y != j) {
-
-                final Block tmp = this.board[i][j];
-                this.board[i][j] = this.board[x][y];
-                this.board[x][y] = tmp;
+                // update enemy
+                enemy.x = character.x;
+                enemy.y = character.y;
 
             }
-
-            // update enemy
-            enemy.x = character.x;
-            enemy.y = character.y;
 
         }
 
@@ -249,70 +239,118 @@ public class Field {
         switch (direction) {
             case "down": {
 
-                // valid move
                 if (this.isEmpty(character.x+1, character.y)) {
-                    character.x = character.x + 1;
-                }
 
-                if (isHero) {
+                    // valid move
+                    this.isValid = true;
+                    character.x = character.x+1;
+
+                } else if (isHero) {
+
+                    // game over
                     this.gameOver = this.isEnemy(character.x+1, character.y);
-                } else {
+
+                    // invalid hero move
                     this.isValid = false;
+
+                } else {
+
+                    // game over
+                    this.gameOver = this.isHero(character.x+1, character.y);
+
+                    // invalid enemy move
+                    this.isValid = false;
+
                 }
 
+                break;
             }
             case "up": {
 
-                // valid move
                 if (this.isEmpty(character.x-1, character.y)) {
-                    character.x = character.x - 1;
-                }
 
-                if (isHero) {
+                    // valid move
+                    this.isValid = true;
+                    character.x = character.x-1;
+
+                } else if (isHero) {
+
+                    // game over
                     this.gameOver = this.isEnemy(character.x-1, character.y);
-                } else {
+
+                    // invalid hero move
                     this.isValid = false;
+
+                } else {
+
+                    // game over
+                    this.gameOver = this.isHero(character.x-1, character.y);
+
+                    // invalid enemy move
+                    this.isValid = false;
+
                 }
 
+                break;
             }
             case "right": {
 
-                // valid move
                 if (this.isEmpty(character.x, character.y+1)) {
-                    character.y = character.y + 1;
-                }
 
-                if (isHero) {
+                    // valid move
+                    this.isValid = true;
+                    character.y = character.y+1;
+
+                } else if (isHero) {
+
+                    // game over
                     this.gameOver = this.isEnemy(character.x, character.y+1);
-                } else {
+
+                    // invalid hero move
                     this.isValid = false;
+
+                } else {
+
+                    // game over
+                    this.gameOver = this.isHero(character.x, character.y+1);
+
+                    // invalid enemy move
+                    this.isValid = false;
+
                 }
 
+                break;
             }
             case "left": {
 
-                // valid move
                 if (this.isEmpty(character.x, character.y-1)) {
-                    character.y = character.y - 1;
-                }
 
-                // game over
-                if (isHero) {
+                    // valid move
+                    this.isValid = true;
+                    character.y = character.y-1;
+
+                } else if (isHero) {
+
+                    // game over
                     this.gameOver = this.isEnemy(character.x, character.y-1);
-                } else {
+
+                    // invalid hero move
                     this.isValid = false;
+
+                } else {
+
+                    // game over
+                    this.gameOver = this.isHero(character.x, character.y-1);
+
+                    // invalid enemy move
+                    this.isValid = false;
+
                 }
 
+                break;
             }
-            default: break;
+            default: this.isValid = false;
 
-        }
-
-        // game over
-        if (isHero) {
-            this.gameOver = this.isEnemy(character.x, character.y-1);
-        } else {
-            this.isValid = false;
         }
 
     }
@@ -328,6 +366,13 @@ public class Field {
     private boolean isEnemy(int i, int j) {
 
         return  (this.board[i][j] instanceof Enemy);
+
+    }
+
+    // helper
+    private boolean isHero(int i, int j) {
+
+        return  (this.board[i][j] instanceof Hero);
 
     }
 

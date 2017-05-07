@@ -58,7 +58,9 @@ public class Main {
 
             // movement
             field.moveEnemies(enemies);
-            hero = field.moveHero(direction, hero);
+            if (!field.isGameOver()) {
+                field.moveHero(direction, hero);
+            }
 
             // print updated board
             field.printField();
