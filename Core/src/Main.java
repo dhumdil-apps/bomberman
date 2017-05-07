@@ -35,11 +35,11 @@ public class Main {
         while (true) {
 
             // print instructions
-            System.out.println("q: quit");
-            System.out.println("w: up");
-            System.out.println("a: left");
-            System.out.println("s: down");
-            System.out.println("d: right");
+            System.out.print("q: quit \t");
+            System.out.print("w: up \t");
+            System.out.print("a: left \t");
+            System.out.print("s: down \t");
+            System.out.print("d: right \n");
 
             // get input
             direction = selectDirection(cin.next());
@@ -64,7 +64,7 @@ public class Main {
             field.printField();
 
             // game over
-            if (hero.x == 0 && hero.y == 0) {
+            if (field.isGameOver()) {
                 System.out.println("Game Over!");
                 break;
             }

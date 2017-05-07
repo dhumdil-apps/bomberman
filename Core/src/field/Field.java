@@ -18,15 +18,21 @@ public class Field {
     private Block[][] board;
     private Random randomGenerator;
     private ArrayList<Block> emptyBlocks;
+    private boolean gameOver;
+    private boolean isValid;
 
     public Field(int size, int countBlocks) {
+
         this.size = size;
+        this.gameOver = false;
+        this.isValid = false;
 
         this.randomGenerator = new Random();
         this.board = new Block[this.size][this.size];
         this.emptyBlocks = new ArrayList<Block>(countBlocks);
 
         this.initBoard();
+
     }
 
     /**
@@ -61,7 +67,6 @@ public class Field {
     }
 
     // initialize
-
     public ArrayList<Block> initEnemies(int countEnemies) {
 
         Block block;
@@ -77,6 +82,7 @@ public class Field {
 
     }
 
+    // initialize
     public void initWalls(int countWalls) {
 
         Block block;
@@ -88,6 +94,7 @@ public class Field {
 
     }
 
+    // initialize
     public Block initHero() {
 
         Block hero = new Hero(1, 1);
@@ -101,7 +108,6 @@ public class Field {
     }
 
     // visualize
-
     public void printField() {
 
         for (int i = 0; i < this.size; i++) {
@@ -135,10 +141,9 @@ public class Field {
     public Block moveHero(String direction, Block hero) {
 
         Block character = new Hero(hero.x, hero.y);
-        final boolean isHero = true;
-        boolean gameOver = validateMove(direction, character, isHero);
+        validateMove(direction, character, true);
 
-        if (!gameOver) {
+        if (!this.gameOver) {
 
             // previous
             final int i = hero.x;
@@ -161,19 +166,57 @@ public class Field {
 
         }
 
-        // TODO: use a method instead...
-        return new Hero(0,0);
+        return hero;
 
     }
 
+    // movement
     public void moveEnemies(ArrayList<Block> enemies) {
 
         for (Block enemy: enemies) {
 
             Block character = new Enemy(enemy.x, enemy.y);
 
-            // TODO: randomize
-            this.validateMove("down", character, false);
+            ArrayList<String> directions = new ArrayList<>();
+            directions.add("up");
+            directions.add("right");
+            directions.add("down");
+            directions.add("left");
+
+            String direction;
+            int random = this.randomize(directions.size());
+
+            // validate move
+            this.isValid = true;
+            this.validateMove(directions.get(random), character, false);
+
+            // if the random directions isn't valid,
+            // then try to use the rest of possible directions
+            while (!this.isValid) {
+
+                // no valid directions available
+                if (directions.size() == 0) {
+                    break;
+                }
+
+                // get new random direction
+                random = (directions.size() == 0) ? 0 : this.randomize(directions.size());
+                direction = directions.get(random);
+                directions.remove(random);
+
+                // reinitialize character
+                character.x = enemy.x;
+                character.y = enemy.y;
+
+                // validate move
+                this.isValid = true;
+                this.validateMove(direction, character, false);
+
+            }
+
+            if (this.isValid) {
+                System.out.println("direction: " + directions.get(random));
+            }
 
             // previous
             final int i = enemy.x;
@@ -201,7 +244,7 @@ public class Field {
     }
 
     // validate movement
-    private boolean validateMove(String direction, Block character, boolean isHero) {
+    private void validateMove(String direction, Block character, boolean isHero) {
 
         switch (direction) {
             case "down": {
@@ -209,11 +252,12 @@ public class Field {
                 // valid move
                 if (this.isEmpty(character.x+1, character.y)) {
                     character.x = character.x + 1;
-                    return false;
                 }
 
                 if (isHero) {
-                    return this.isEnemy(character.x+1, character.y);
+                    this.gameOver = this.isEnemy(character.x+1, character.y);
+                } else {
+                    this.isValid = false;
                 }
 
             }
@@ -222,11 +266,12 @@ public class Field {
                 // valid move
                 if (this.isEmpty(character.x-1, character.y)) {
                     character.x = character.x - 1;
-                    return false;
                 }
 
                 if (isHero) {
-                    return this.isEnemy(character.x-1, character.y);
+                    this.gameOver = this.isEnemy(character.x-1, character.y);
+                } else {
+                    this.isValid = false;
                 }
 
             }
@@ -235,11 +280,12 @@ public class Field {
                 // valid move
                 if (this.isEmpty(character.x, character.y+1)) {
                     character.y = character.y + 1;
-                    return false;
                 }
 
                 if (isHero) {
-                    return this.isEnemy(character.x, character.y+1);
+                    this.gameOver = this.isEnemy(character.x, character.y+1);
+                } else {
+                    this.isValid = false;
                 }
 
             }
@@ -248,12 +294,13 @@ public class Field {
                 // valid move
                 if (this.isEmpty(character.x, character.y-1)) {
                     character.y = character.y - 1;
-                    return false;
                 }
 
                 // game over
                 if (isHero) {
-                    return this.isEnemy(character.x, character.y-1);
+                    this.gameOver = this.isEnemy(character.x, character.y-1);
+                } else {
+                    this.isValid = false;
                 }
 
             }
@@ -261,24 +308,30 @@ public class Field {
 
         }
 
-        return false;
+        // game over
+        if (isHero) {
+            this.gameOver = this.isEnemy(character.x, character.y-1);
+        } else {
+            this.isValid = false;
+        }
 
     }
 
-    // helpers
-
+    // helper
     private boolean isEmpty(int i, int j) {
 
         return (this.board[i][j] instanceof EmptyBlock);
 
     }
 
+    // helper
     private boolean isEnemy(int i, int j) {
 
         return  (this.board[i][j] instanceof Enemy);
 
     }
 
+    // helper
     private boolean isBorder(int i, int j) {
 
         boolean isOuterBorder = (i == 0 || j == 0 || i == this.size - 1 || j == this.size - 1);
@@ -288,6 +341,14 @@ public class Field {
 
     }
 
+    // helper
+    public boolean isGameOver() {
+
+        return this.gameOver;
+
+    }
+
+    // helper
     private int randomize(int max) {
 
         // return random number
@@ -295,6 +356,7 @@ public class Field {
 
     }
 
+    // helper
     private Block getRandomEmptyBlock() {
 
         // random pick of empty block
