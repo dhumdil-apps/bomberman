@@ -56,15 +56,18 @@ public class Main {
                 break;
             }
 
-            // execute hero movement
+            // movement
+            field.moveEnemies(enemies);
             hero = field.moveHero(direction, hero);
+
+            // print updated board
+            field.printField();
+
+            // game over
             if (hero.x == 0 && hero.y == 0) {
                 System.out.println("Game Over!");
                 break;
             }
-
-            // print updated board
-            field.printField();
 
         }
 

@@ -166,21 +166,39 @@ public class Field {
 
     }
 
-/*
-    public ArrayList<Block> moveEnemies(ArrayList<Block> enemies) {
+    public void moveEnemies(ArrayList<Block> enemies) {
 
-        // TODO:
-        // iterate over enemies execute the movement if possible,
-        // in foreach example:
-        // Block character = validateMove(<direction>, enemy);
-        // <direction> -> random from this array: ["down", "up", "right", "left"]
-        // in case there is no valid direction, don't move.
-        // else: this.move(enemy, character);
+        for (Block enemy: enemies) {
 
-        return enemies;
+            Block character = new Enemy(enemy.x, enemy.y);
+
+            // TODO: randomize
+            this.validateMove("down", character, false);
+
+            // previous
+            final int i = enemy.x;
+            final int j = enemy.y;
+
+            // new
+            final int x = character.x;
+            final int y = character.y;
+
+            // if the position was updated -> swap content
+            if (x != i || y != j) {
+
+                final Block tmp = this.board[i][j];
+                this.board[i][j] = this.board[x][y];
+                this.board[x][y] = tmp;
+
+            }
+
+            // update enemy
+            enemy.x = character.x;
+            enemy.y = character.y;
+
+        }
 
     }
-*/
 
     // validate movement
     private boolean validateMove(String direction, Block character, boolean isHero) {
@@ -194,7 +212,9 @@ public class Field {
                     return false;
                 }
 
-                return (this.isEnemy(character.x+1, character.y) && isHero);
+                if (isHero) {
+                    return this.isEnemy(character.x+1, character.y);
+                }
 
             }
             case "up": {
@@ -205,7 +225,9 @@ public class Field {
                     return false;
                 }
 
-                return (this.isEnemy(character.x-1, character.y) && isHero);
+                if (isHero) {
+                    return this.isEnemy(character.x-1, character.y);
+                }
 
             }
             case "right": {
@@ -216,7 +238,9 @@ public class Field {
                     return false;
                 }
 
-                return (this.isEnemy(character.x, character.y+1) && isHero);
+                if (isHero) {
+                    return this.isEnemy(character.x, character.y+1);
+                }
 
             }
             case "left": {
@@ -228,13 +252,15 @@ public class Field {
                 }
 
                 // game over
-                return (this.isEnemy(character.x, character.y-1) && isHero);
+                if (isHero) {
+                    return this.isEnemy(character.x, character.y-1);
+                }
 
             }
             default: break;
 
         }
-        
+
         return false;
 
     }
