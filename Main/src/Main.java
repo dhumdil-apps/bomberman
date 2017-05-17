@@ -5,7 +5,7 @@ import javax.swing.*;
 import gui.screen.*;
 
 // core
-
+import core.board.*;
 
 public class Main extends JFrame {
 
@@ -24,7 +24,8 @@ public class Main extends JFrame {
 
     }
 
-    public void run(DisplayMode dm) {
+    // gui
+    private void run(DisplayMode dm) {
 
         setBackground(Color.BLACK);
         setForeground(Color.cyan);
@@ -34,7 +35,7 @@ public class Main extends JFrame {
 
         try {
 
-            s.setFullScreen(dm, this);
+            s.setFullScreen(dm);
 
             // visualize and get back to normal
             try {
@@ -48,7 +49,6 @@ public class Main extends JFrame {
         }
 
     }
-
     public void paint(Graphics g) {
 
         if (g instanceof Graphics2D) {
@@ -60,6 +60,7 @@ public class Main extends JFrame {
 
     }
 
+    // core
     private static int selectSize(String size) {
 
         switch (size) {
@@ -72,7 +73,6 @@ public class Main extends JFrame {
         }
 
     }
-
     private static int selectLevel(String level) {
 
         switch (level) {
