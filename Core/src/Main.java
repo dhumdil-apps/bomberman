@@ -1,8 +1,4 @@
-import field.block.Block;
-import field.Field;
-
-import java.util.Scanner;
-import java.util.ArrayList;
+import board.Board;
 
 public class Main {
 
@@ -10,68 +6,8 @@ public class Main {
 
         int size = selectSize("xlg");
         int lvl = selectLevel("insane");
-        int countEnemies = lvl * 2;
-        int countBlocks = (size * (size + 1)) + ((size + 1) * (((size * 2) + 3) - 2));
-        int countWalls = ((countBlocks - 9) > 0) ? (countBlocks - countEnemies - 9)/2 : 0;
-        size = (size * 2) + 3;
 
-        // init board
-        Field field = new Field(size, countBlocks);
-
-        // init enemies
-        ArrayList<Block> enemies = field.initEnemies(countEnemies);
-
-        // init walls
-        field.initWalls(countWalls);
-
-        // init hero
-        Block hero = field.initHero();
-
-        field.printField();
-
-        // cli demo:
-        Scanner cin = new Scanner(System.in);
-        String direction;
-        while (true) {
-
-            // print instructions
-            System.out.print("q: quit \t");
-            System.out.print("w: up \t");
-            System.out.print("a: left \t");
-            System.out.print("s: down \t");
-            System.out.print("d: right \n");
-
-            // get input
-            direction = selectDirection(cin.next());
-
-            // validate input
-            if (direction.equals("")) {
-                System.out.println("Input error, try again:");
-                continue;
-            }
-
-            // check if the game is over
-            if (direction.equals("q")) {
-                System.out.println("Quitting...");
-                break;
-            }
-
-            // movement
-            field.moveEnemies(enemies);
-            if (!field.isGameOver()) {
-                field.moveHero(direction, hero);
-            }
-
-            // print updated board
-            field.printField();
-
-            // game over
-            if (field.isGameOver()) {
-                System.out.println("Game Over!");
-                break;
-            }
-
-        }
+        new Board(size, lvl);
 
     }
 
@@ -98,19 +34,6 @@ public class Main {
             case "hard": return 3;
             case "insane": return 4;
             default: return 2;
-        }
-
-    }
-
-    private static String selectDirection(String input) {
-
-        switch (input) {
-            case "w": return "up";
-            case "a": return "left";
-            case "s": return "down";
-            case "d": return "right";
-            case "q": return "q";
-            default: return "";
         }
 
     }
