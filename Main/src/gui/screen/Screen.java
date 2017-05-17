@@ -3,8 +3,6 @@ package gui.screen;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferStrategy;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.Buffer;
 import javax.swing.JFrame;
 
 public class Screen {

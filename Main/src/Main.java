@@ -2,10 +2,9 @@ import java.awt.*;
 import javax.swing.*;
 
 // gui
-import gui.screen.*;
 
 // core
-import core.board.*;
+import gui.screen.Screen;
 
 public class Main extends JFrame {
 
