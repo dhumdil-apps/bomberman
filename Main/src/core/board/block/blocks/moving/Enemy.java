@@ -1,8 +1,8 @@
-package board.block.blocks.moving;
+package core.board.block.blocks.moving;
 
-import board.Board;
-import board.block.Block;
-import board.block.blocks.standing.EmptyBlock;
+import core.board.Board;
+import core.board.block.Block;
+import core.board.block.blocks.standing.EmptyBlock;
 
 import java.util.ArrayList;
 

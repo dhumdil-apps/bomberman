@@ -1,8 +1,8 @@
-package board.block;
+package core.board.block;
 
 abstract public class Block {
 
-    // position on the board
+    // position on the core.board
     public int x;
     public int y;
 

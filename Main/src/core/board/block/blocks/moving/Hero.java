@@ -1,9 +1,7 @@
-package board.block.blocks.moving;
+package core.board.block.blocks.moving;
 
 import java.util.Scanner;
-import board.Board;
-import board.block.Block;
-import board.block.blocks.standing.EmptyBlock;
+import core.board.Board;
 
 public class Hero extends Character implements Runnable {
 

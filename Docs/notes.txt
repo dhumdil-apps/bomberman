@@ -1,3 +1,0 @@
-nazov: Skel
-studenti: ?, ?
-

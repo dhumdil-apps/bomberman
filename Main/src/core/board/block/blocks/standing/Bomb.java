@@ -1,6 +1,6 @@
-package board.block.blocks.standing;
+package core.board.block.blocks.standing;
 
-import board.block.Block;
+import core.board.block.Block;
 
 public class Bomb extends Block {
 

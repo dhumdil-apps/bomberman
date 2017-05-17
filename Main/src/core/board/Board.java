@@ -1,11 +1,11 @@
-package board;
+package core.board;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import board.block.*;
-import board.block.blocks.standing.*;
-import board.block.blocks.moving.*;
+import core.board.block.*;
+import core.board.block.blocks.standing.*;
+import core.board.block.blocks.moving.*;
 
 public class Board {
 
@@ -26,7 +26,7 @@ public class Board {
         board = new Block[size][size];
         ArrayList<Block> emptyBlocks = new ArrayList<>(countBlocks);
 
-        // init the board
+        // init the core.board
         this.initBoard(emptyBlocks);
         this.createEnemies(countEnemies, emptyBlocks);
         this.createWalls(countWalls, emptyBlocks);
@@ -101,7 +101,7 @@ public class Board {
         // TODO - check if there are available empty blocks
         for (int i = 0; i < countEnemies; i++) {
             block = this.getRandomEmptyBlock(emptyBlocks);
-            board[block.x][block.y] = new Enemy(block.x, block.y);
+            core.board[block.x][block.y] = new Enemy(block.x, block.y);
         }
 */
     }
@@ -123,7 +123,7 @@ public class Board {
     }
 
     /**
-     * Visualize the board on a CLI
+     * Visualize the core.board on a CLI
      */
     public static void viewBoard() {
 
