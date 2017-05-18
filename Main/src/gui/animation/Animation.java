@@ -10,7 +10,7 @@ public class Animation {
     private long movieTime;
     private long totalTime;
 
-    private Animation() {
+    public Animation() {
 
         scenes = new ArrayList();
         totalTime = 0;

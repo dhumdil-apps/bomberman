@@ -1,86 +1,85 @@
 import java.awt.*;
+import java.awt.Image;
 import javax.swing.*;
 
 // gui
+import gui.screen.*;
+import gui.animation.*;
 
 // core
-import gui.screen.Screen;
+import core.board.*;
 
 public class Main extends JFrame {
 
     public static void main(String[] args) {
 
-        // http://docs.oracle.com/javase/6/docs/api/java/awt/DisplayMode.html
-        DisplayMode dm = new DisplayMode(1366, 768, DisplayMode.BIT_DEPTH_MULTI, DisplayMode.REFRESH_RATE_UNKNOWN);
         Main game = new Main();
+        game.run();
 
-        game.run(dm);
-
-        // int size = selectSize("xlg");
-        // int lvl = selectLevel("insane");
-
-        // new Board(size, lvl);
+        // new Board();
 
     }
 
-    // gui
-    private void run(DisplayMode dm) {
+    // GUI
+
+    private Animation animation;
+    private Screen screen;
+
+    private void run() {
 
         setBackground(Color.BLACK);
         setForeground(Color.cyan);
         setFont( new Font("Arial", Font.PLAIN, 24) );
 
-        Screen s = new Screen();
+        screen = new Screen();
 
         try {
 
-            s.setFullScreen(dm);
+            DisplayMode dm = screen.getDisplayMode();
+            screen.setFullScreen(dm);
 
-            // visualize and get back to normal
-            try {
-                Thread.sleep(5000);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+
+            // load images
+            Image background = new ImageIcon(this.getClass().getResource("/resources/bg.jpg")).getImage();
+            Image face1 = new ImageIcon(this.getClass().getResource("/resources/face1.png")).getImage();
+            Image face2 = new ImageIcon(this.getClass().getResource("/resources/face2.png")).getImage();
+
+            // add animation
+            animation = new Animation();
+            animation.addScene(face1, 250);
+            animation.addScene(face2, 250);
+
+            // movieLoop
+            long startingTime = System.currentTimeMillis();
+            long cumulativeTime = startingTime;
+
+            while (cumulativeTime - startingTime < 6000) {
+
+                long timePassed = System.currentTimeMillis() - cumulativeTime;
+                cumulativeTime += timePassed;
+                animation.update(timePassed);
+
+                // draw & update screen
+                Graphics2D g = screen.getGraphics();
+
+                // draw graphics: bg & hero:
+                g.drawImage(background, 0, 0, null);
+                g.drawImage(animation.getImage(), 333, 33, null);
+
+                // reinit...
+                g.dispose();
+                screen.update();
+
+                // 'animate'
+                try {
+                    Thread.sleep(50);
+                } catch (Exception e) { }
+
             }
 
+
         } finally {
-            s.restoreScreen();
-        }
-
-    }
-    public void paint(Graphics g) {
-
-        if (g instanceof Graphics2D) {
-            Graphics2D g2 = (Graphics2D)g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        }
-
-        g.drawString("Test", 200, 200);
-
-    }
-
-    // core
-    private static int selectSize(String size) {
-
-        switch (size) {
-            case "xsm": return 1;
-            case "sm": return 2;
-            case "md": return 3;
-            case "lg": return 4;
-            case "xlg": return 5;
-            default: return 2;
-        }
-
-    }
-    private static int selectLevel(String level) {
-
-        switch (level) {
-            case "basic": return 0;
-            case "easy": return 1;
-            case "medium": return 2;
-            case "hard": return 3;
-            case "insane": return 4;
-            default: return 2;
+            screen.restoreScreen();
         }
 
     }

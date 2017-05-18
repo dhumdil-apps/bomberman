@@ -13,10 +13,11 @@ public class Board {
     private static boolean gameOver;
     private static Random randomGenerator = new Random();
 
-    public Board(int size, int lvl) {
+    public Board() {
 
         // some calculations to generate the game content
-        int countEnemies = lvl * 2;
+        int size = 2;
+        int countEnemies = 4;
         int countBlocks = (size * (size + 1)) + ((size + 1) * (((size * 2) + 3) - 2));
         int countWalls = ((countBlocks - 9) > 0) ? (countBlocks - countEnemies - 9)/2 : 0;
         size = (size * 2) + 3;

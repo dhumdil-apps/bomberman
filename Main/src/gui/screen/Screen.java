@@ -1,8 +1,7 @@
 package gui.screen;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferStrategy;
+import java.awt.image.*;
 import javax.swing.JFrame;
 
 public class Screen {
@@ -18,56 +17,38 @@ public class Screen {
 
     }
 
-    public DisplayMode findCompatibleMode(DisplayMode[] modes) {
+    public DisplayMode getDisplayMode() {
 
-        DisplayMode[] supportedModes = vc.getDisplayModes();
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
 
-        for(DisplayMode mode: modes) {
-            for (DisplayMode supported: supportedModes) {
-                if (isModeMatch(mode, supported)) {
-                    return mode;
-                }
+        for (int i = 0; i < gs.length; i++) {
+
+            DisplayMode dm = gs[i].getDisplayMode();
+
+            int width = dm.getWidth();
+            int height = dm.getHeight();
+            System.out.println(width +"x"+ height);
+
+            int refreshRate = dm.getRefreshRate();
+            if (refreshRate == DisplayMode.REFRESH_RATE_UNKNOWN) {
+                System.out.println("Unknown rate");
+            } else {
+                System.out.println("Refresh rate: " + refreshRate);
             }
+
+            int bitDepth = dm.getBitDepth();
+            if (bitDepth != DisplayMode.BIT_DEPTH_MULTI) {
+                System.out.println("BIT DEPTH: MULTI");
+            } else {
+                System.out.println("BIT DEPTH: " + bitDepth);
+            }
+
+            return dm;
+
         }
 
         return null;
-
-    }
-
-    private boolean isModeMatch(DisplayMode m1, DisplayMode m2) {
-
-        // validate width & height
-        if (m1.getWidth() != m2.getWidth()) {
-            return false;
-        }
-        if (m1.getHeight() != m2.getHeight()) {
-            return false;
-        }
-
-        // validate bit depth
-        if (m1.getBitDepth() != m2.getBitDepth()) {
-            return false;
-        }
-        if (m1.getBitDepth() != DisplayMode.BIT_DEPTH_MULTI) {
-            return false;
-        }
-        if (m2.getBitDepth() != DisplayMode.BIT_DEPTH_MULTI) {
-            return false;
-        }
-
-        // validate refresh date
-        if (m1.getRefreshRate() != m2.getRefreshRate()) {
-            return false;
-        }
-        if (m1.getRefreshRate() != DisplayMode.REFRESH_RATE_UNKNOWN) {
-            return false;
-        }
-        if (m2.getRefreshRate() != DisplayMode.REFRESH_RATE_UNKNOWN) {
-            return false;
-        }
-
-        return true;
-
     }
 
     public void setFullScreen(DisplayMode dm) {
