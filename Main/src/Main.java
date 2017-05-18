@@ -24,13 +24,19 @@ public class Main extends JFrame implements KeyListener {
     private Screen screen;
     private Window window;
     private Sprite sprite;
+
+    // messages
     private String keyEventMessage;
     private String errMessage;
     private String helpMessage;
+
+    // game
     private boolean running;
+
     // position
     private long x = 333;
     private long y = 33;
+
     // move
     private int stepY;
     private int stepX;
