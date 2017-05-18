@@ -15,11 +15,11 @@ public class Sprite {
         this.animation = animation;
     }
 
-    public void update(long timePassed) {
+    public void update(long timePassed, float x, float y) {
 
         // update position
-        this.x += this.velocityX * timePassed;
-        this.y += this.velocityY * timePassed;
+        this.x = x;
+        this.y = y;
 
         this.animation.update(timePassed);
 

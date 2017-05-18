@@ -26,6 +26,9 @@ public class Main extends JFrame implements KeyListener {
     private Sprite sprite;
     private String message;
     private boolean running;
+    // position
+    private long x = 333;
+    private long y = 33;
 
     // CORE
     private void run() {
@@ -65,34 +68,18 @@ public class Main extends JFrame implements KeyListener {
             sprite = new Sprite(animation);
 
             // init speed
-            sprite.setVelocityX(0.3f);
-            sprite.setVelocityY(0.3f);
+            sprite.setVelocityX(0.9f);
+            sprite.setVelocityY(0.9f);
 
             // movieLoop
-            long startingTime = System.currentTimeMillis();
-            long cumulativeTime = startingTime;
-
-            // simulate for 6 sec
+            long cumulativeTime = System.currentTimeMillis();
             while (running) {
 
                 long timePassed = System.currentTimeMillis() - cumulativeTime;
                 cumulativeTime += timePassed;
 
-                // update velocity
-                if (sprite.getX() < 0) {
-                    sprite.setVelocityX(Math.abs(sprite.getVelocityX()));
-                } else if (sprite.getX() + sprite.getWidth() >= screen.getWidth()) {
-                    sprite.setVelocityX(-Math.abs(sprite.getVelocityX()));
-                }
-                if (sprite.getY() < 0) {
-                    sprite.setVelocityY(Math.abs(sprite.getVelocityY()));
-                } else if (sprite.getY() + sprite.getHeight() >= screen.getHeight()) {
-                    sprite.setVelocityY(-Math.abs(sprite.getVelocityY()));
-                }
-
                 // update position
-                sprite.update(timePassed);
-
+                sprite.update(timePassed, x, y);
 
                 // draw & update screen
                 Graphics2D g = screen.getGraphics();
@@ -103,19 +90,21 @@ public class Main extends JFrame implements KeyListener {
                 // draw sprite
                 g.drawImage(sprite.getImage(), Math.round(sprite.getX()), Math.round(sprite.getY()), null);
 
-                // reinit...
+                // draw key events
+                g.drawString(message, 30, 30);
+
+                // reinit view...
                 g.dispose();
                 screen.update();
 
                 // 'sleep'
                 try {
-                    Thread.sleep(20);
+                     Thread.sleep(50);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
 
             }
-
 
         } finally {
             screen.restoreScreen();
@@ -132,6 +121,38 @@ public class Main extends JFrame implements KeyListener {
             running = false;
         } else {
 
+            if (keyCode == KeyEvent.VK_RIGHT) {
+                if (sprite.getX() < 923) {
+                    x += 10;
+                } else {
+                    x = 933;
+                }
+            }
+
+            if (keyCode == KeyEvent.VK_LEFT) {
+                if (sprite.getX() > 343) {
+                    x -= 10;
+                } else {
+                    x = 333;
+                }
+            }
+
+            if (keyCode == KeyEvent.VK_UP) {
+                if (sprite.getY() > 43) {
+                    y -= 10;
+                } else {
+                    y = 33;
+                }
+            }
+
+            if (keyCode == KeyEvent.VK_DOWN) {
+                if (sprite.getY() < 623) {
+                    y += 10;
+                } else {
+                    y = 633;
+                }
+            }
+
             message = "You Pressed: " + KeyEvent.getKeyText(keyCode);
             e.consume();
 
@@ -140,25 +161,13 @@ public class Main extends JFrame implements KeyListener {
     }
     public void keyReleased(KeyEvent e) {
 
-        int keyCode = e.getKeyCode();
-
-        message = "You Released: " + KeyEvent.getKeyText(keyCode);
+        // int keyCode = e.getKeyCode();
+        // message = "You Released: " + KeyEvent.getKeyText(keyCode);
         e.consume();
 
     }
     public void keyTyped(KeyEvent e) {
         e.consume();
     }
-
-// draw
-//    public synchronized void draw(Graphics2D g) {
-//
-//        Window w = screen.getFullScreen();
-//        g.setBackground(w.getBackground());
-//        g.fillRect(0, 0, screen.getWidth(), screen.getHeight());
-//        g.setColor(w.getForeground());
-//        g.drawString(message, 30, 30);
-//
-//    }
 
 }
