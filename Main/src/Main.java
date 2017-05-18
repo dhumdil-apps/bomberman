@@ -24,11 +24,16 @@ public class Main extends JFrame implements KeyListener {
     private Screen screen;
     private Window window;
     private Sprite sprite;
-    private String message;
+    private String keyEventMessage;
+    private String errMessage;
+    private String helpMessage;
     private boolean running;
     // position
     private long x = 333;
     private long y = 33;
+    // move
+    private int stepY;
+    private int stepX;
 
     // CORE
     private void run() {
@@ -38,7 +43,11 @@ public class Main extends JFrame implements KeyListener {
         setForeground(Color.cyan);
         setFont( new Font("Arial", Font.PLAIN, 24) );
 
-        message = "Press Esc or Q to Exit.";
+        // output messages
+        keyEventMessage = "Navigate using arrow keys.";
+        errMessage = "";
+        helpMessage = "Press Esc to Exit.";
+
         running = true;
 
         screen = new Screen();
@@ -67,10 +76,6 @@ public class Main extends JFrame implements KeyListener {
             // animate the image position
             sprite = new Sprite(animation);
 
-            // init speed
-            sprite.setVelocityX(0.9f);
-            sprite.setVelocityY(0.9f);
-
             // movieLoop
             long cumulativeTime = System.currentTimeMillis();
             while (running) {
@@ -78,7 +83,24 @@ public class Main extends JFrame implements KeyListener {
                 long timePassed = System.currentTimeMillis() - cumulativeTime;
                 cumulativeTime += timePassed;
 
-                // update position
+                // update X position
+                if (sprite.getX() <= 343 && stepX < 0) {
+                    x = 333;
+                } else if (sprite.getX() >= 923 && stepX > 0) {
+                    x = 933;
+                } else {
+                    x += stepX;
+                }
+
+                // update Y position
+                if (sprite.getY() >= 623 && stepY > 0) {
+                    y = 633;
+                } else if (sprite.getY() <= 43 && stepY < 0) {
+                    y = 33;
+                } else {
+                    y += stepY;
+                }
+
                 sprite.update(timePassed, x, y);
 
                 // draw & update screen
@@ -90,8 +112,12 @@ public class Main extends JFrame implements KeyListener {
                 // draw sprite
                 g.drawImage(sprite.getImage(), Math.round(sprite.getX()), Math.round(sprite.getY()), null);
 
-                // draw key events
-                g.drawString(message, 30, 30);
+                // draw key event messages
+                g.drawString(helpMessage, 30, 30);
+                g.drawString(keyEventMessage, 30, 50);
+                if (!errMessage.equals("")) {
+                    g.drawString(errMessage, 30, 700);
+                }
 
                 // reinit view...
                 g.dispose();
@@ -122,38 +148,22 @@ public class Main extends JFrame implements KeyListener {
         } else {
 
             if (keyCode == KeyEvent.VK_RIGHT) {
-                if (sprite.getX() < 923) {
-                    x += 10;
-                } else {
-                    x = 933;
-                }
+                stepX = 10;
             }
 
             if (keyCode == KeyEvent.VK_LEFT) {
-                if (sprite.getX() > 343) {
-                    x -= 10;
-                } else {
-                    x = 333;
-                }
+                stepX = -10;
             }
 
             if (keyCode == KeyEvent.VK_UP) {
-                if (sprite.getY() > 43) {
-                    y -= 10;
-                } else {
-                    y = 33;
-                }
+                stepY = -10;
             }
 
             if (keyCode == KeyEvent.VK_DOWN) {
-                if (sprite.getY() < 623) {
-                    y += 10;
-                } else {
-                    y = 633;
-                }
+                stepY = 10;
             }
 
-            message = "You Pressed: " + KeyEvent.getKeyText(keyCode);
+            keyEventMessage = "Pressed: " + KeyEvent.getKeyText(keyCode);
             e.consume();
 
         }
@@ -161,8 +171,19 @@ public class Main extends JFrame implements KeyListener {
     }
     public void keyReleased(KeyEvent e) {
 
-        // int keyCode = e.getKeyCode();
-        // message = "You Released: " + KeyEvent.getKeyText(keyCode);
+        int keyCode = e.getKeyCode();
+
+        // Y not moving
+        if (keyCode == KeyEvent.VK_DOWN || (keyCode == KeyEvent.VK_UP)) {
+            stepY = 0;
+        }
+
+        // X not moving
+        if (keyCode == KeyEvent.VK_RIGHT || (keyCode == KeyEvent.VK_LEFT)) {
+            stepX = 0;
+        }
+
+        // keyEventMessage = "Released: " + KeyEvent.getKeyText(keyCode);
         e.consume();
 
     }
