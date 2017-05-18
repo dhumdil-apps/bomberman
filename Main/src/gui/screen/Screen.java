@@ -22,15 +22,17 @@ public class Screen {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
 
-        for (int i = 0; i < gs.length; i++) {
+        if (gs.length > 0) {
 
-            DisplayMode dm = gs[i].getDisplayMode();
+            DisplayMode dm = gs[0].getDisplayMode();
+            System.out.println("Screen info:");
 
             int width = dm.getWidth();
             int height = dm.getHeight();
             System.out.println(width +"x"+ height);
 
             int refreshRate = dm.getRefreshRate();
+
             if (refreshRate == DisplayMode.REFRESH_RATE_UNKNOWN) {
                 System.out.println("Unknown rate");
             } else {
@@ -38,6 +40,7 @@ public class Screen {
             }
 
             int bitDepth = dm.getBitDepth();
+
             if (bitDepth != DisplayMode.BIT_DEPTH_MULTI) {
                 System.out.println("BIT DEPTH: MULTI");
             } else {
