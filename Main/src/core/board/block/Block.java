@@ -2,9 +2,11 @@ package core.board.block;
 
 abstract public class Block {
 
-    // position on the core.board
     public int x;
     public int y;
+    protected final static int imageSize = 100;
+    protected final static int X = 333;
+    protected final static int Y = 33;
 
     public Block(int i, int j) {
         this.x = i;

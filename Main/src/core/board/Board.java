@@ -1,43 +1,72 @@
 package core.board;
 
+// basic
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+// gui
+import gui.image.ImageObject;
+import gui.screen.Screen;
+
+// core
 import core.board.block.*;
-import core.board.block.blocks.standing.*;
 import core.board.block.blocks.moving.*;
+import core.board.block.blocks.standing.*;
+import gui.sprite.Sprite;
 
-public class Board {
+public class Board extends JFrame {
 
+    // GUI
+    private Screen screen;
+
+    // CORE
     private static Block[][] board;
     private static boolean gameOver;
-    private static Random randomGenerator = new Random();
+    private Thread hero;
+    private static ArrayList<Sprite> sprites;
+    private static ArrayList<ImageObject> images;
+
+    // HELPERS
+    private static Random randomGenerator;
+    public static String keyEventMessage;
+    public static String logMessage;
 
     public Board() {
 
-        // some calculations to generate the game content
-        int size = 2;
-        int countEnemies = 4;
-        int countBlocks = (size * (size + 1)) + ((size + 1) * (((size * 2) + 3) - 2));
+        // base config
+        // (some calculations to generate the game content)
+        final int SIZE = 2;
+        int size = (SIZE * 2) + 3;
+        int countEnemies = 1;
+        int countBlocks = (SIZE * (SIZE + 1)) + ((SIZE + 1) * (((SIZE * 2) + 3) - 2));
         int countWalls = ((countBlocks - 9) > 0) ? (countBlocks - countEnemies - 9)/2 : 0;
-        size = (size * 2) + 3;
 
+        // initialize
         gameOver = false;
-
         board = new Block[size][size];
         ArrayList<Block> emptyBlocks = new ArrayList<>(countBlocks);
+        randomGenerator = new Random();
+        sprites = new ArrayList<>();
+        images = new ArrayList<>();
 
-        // init the core.board
+        // load background image
+        Image background = new ImageIcon(this.getClass().getResource("/gui/resources/bg.jpg")).getImage();
+        images.add( new ImageObject(background, 0, 0) );
+
+        // initialize the board content
         this.initBoard(emptyBlocks);
         this.createEnemies(countEnemies, emptyBlocks);
         this.createWalls(countWalls, emptyBlocks);
 
-        // create Hero Thread
-        Thread hero = new Thread( new Hero(1, 1) );
-        hero.start();
-
     }
 
+    /**
+     * Register Block in Board
+     *
+     * @param block - the block to register in the board
+     */
     public static void createBlock(Block block) {
         board[block.x][block.y] = block;
     }
@@ -96,15 +125,6 @@ public class Board {
 
         }
 
-//        Thread[] hero = new Thread( );
-//        hero.start();
-/*
-        // TODO - check if there are available empty blocks
-        for (int i = 0; i < countEnemies; i++) {
-            block = this.getRandomEmptyBlock(emptyBlocks);
-            core.board[block.x][block.y] = new Enemy(block.x, block.y);
-        }
-*/
     }
 
     /**
@@ -120,39 +140,6 @@ public class Board {
             block = this.getRandomEmptyBlock(emptyBlocks);
             board[block.x][block.y] = new Wall(block.x, block.y);
         }
-
-    }
-
-    /**
-     * Visualize the core.board on a CLI
-     */
-    public static void viewBoard() {
-
-        for (int i = 0; i < board.length; i++) {
-
-            for (int j = 0; j < board.length; j++) {
-
-                if (board[i][j] instanceof Border) {
-                    System.out.print( " #" );
-                } else if (board[i][j] instanceof Wall) {
-                    System.out.print( " ." );
-                } else if (board[i][j] instanceof Hero) {
-                    System.out.print( " H" );
-                } else if (board[i][j] instanceof Enemy) {
-                    System.out.print( " E" );
-                } else if (board[i][j] instanceof Bomb) {
-                    System.out.print( " B" );
-                } else {
-                    System.out.print( "  " );
-                }
-
-            }
-
-            System.out.println();
-        }
-
-        System.out.println();
-        System.out.println();
 
     }
 
@@ -253,6 +240,122 @@ public class Board {
      */
     public static boolean isHero(int i, int j) {
         return  (board[i][j] instanceof Hero);
+    }
+
+    /**
+     * Size getter
+     * @return - board size
+     */
+    public static int getLength() {
+        return board.length;
+    }
+
+    public synchronized static void addSprite(Sprite s) {
+        sprites.add(s);
+    }
+
+    public synchronized static void addImage(ImageObject image) {
+        images.add(image);
+    }
+
+    /**
+     * Initialize game window
+     */
+    public void run() {
+
+        try {
+
+            // config
+            setBackground(Color.BLACK);
+            setForeground(Color.cyan);
+            setFont( new Font("Arial", Font.PLAIN, 24) );
+
+            // messages
+            keyEventMessage = "Press Esc or Q to Exit. Navigate using arrow keys.";
+            logMessage = "";
+
+            screen = new Screen();
+
+            // make full screen
+            DisplayMode dm = screen.getDisplayMode();
+            screen.setFullScreen(dm);
+
+            // get window, set full screen
+            Window window = screen.getFullScreen();
+            window.setFocusTraversalKeysEnabled(false);
+
+            // create Hero (add him the key listener)
+            hero = new Thread( new Hero(1, 1, window) );
+
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    /**
+     * Start
+     */
+    public void start() {
+        try {
+
+            // TODO: start enemies
+            hero.start();
+            movieLoop();
+
+        } finally {
+            screen.restoreScreen();
+        }
+    }
+
+    /**
+     * Update the view, while not game over.
+     */
+    private void movieLoop() {
+
+        Graphics2D graphics;
+        long cumulativeTime = System.currentTimeMillis();
+        long timePassed;
+
+        while (!gameOver) {
+
+            // update sprite animations
+            timePassed = System.currentTimeMillis() - cumulativeTime;
+            cumulativeTime += timePassed;
+            for (Sprite sprite: sprites) {
+                sprite.update(timePassed);
+            }
+
+            // graphics to draw on & update screen
+            graphics = screen.getGraphics();
+
+            // draw images
+            for (ImageObject image: images) {
+                graphics.drawImage(image.getImage(), image.getX(), image.getY(), null);
+            }
+
+            // draw sprites
+            for (Sprite sprite: sprites) {
+                graphics.drawImage(sprite.getImage(), Math.round(sprite.getX()), Math.round(sprite.getY()), null);
+            }
+
+            // draw messages
+            graphics.drawString(keyEventMessage, 33, 33);
+            graphics.drawString(logMessage, 33, 63);
+
+            // update the view...
+            graphics.dispose();
+            screen.update();
+
+            // 'sleep/animate'
+            try {
+                Thread.sleep(50);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+
     }
 
 }

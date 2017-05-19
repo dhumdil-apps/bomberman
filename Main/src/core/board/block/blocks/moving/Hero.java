@@ -1,136 +1,150 @@
 package core.board.block.blocks.moving;
 
-import java.util.Scanner;
+// core
 import core.board.Board;
 
-public class Hero extends Character implements Runnable {
+// gui
+import gui.animation.Animation;
+import gui.sprite.Sprite;
 
-    // user input
-    private static Scanner cin = new Scanner(System.in);
+// system
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-    public Hero(int x, int y) {
+public class Hero extends Character implements KeyListener {
+
+    private static boolean listenKeys;
+
+    public Hero(int x, int y, Window window) {
+
         super(x, y);
+
+        // load images
+        Image image1 = new ImageIcon(this.getClass().getResource("/gui/resources/hero1.png")).getImage();
+        Image image2 = new ImageIcon(this.getClass().getResource("/gui/resources/hero2.png")).getImage();
+
+        // animate image
+        this.animation = new Animation();
+        this.animation.addScene(image1, 300);
+        this.animation.addScene(image2, 300);
+
+        // animate position
+        this.sprite = new Sprite(animation, (imageSize * this.y) + X, (imageSize * this.x) + Y);
+        Board.addSprite(this.sprite);
+
+        // add key listener
+        window.addKeyListener(this);
+
     }
 
     public void live() {
 
-        // show instructions
-        System.out.print("q: quit \t");
-        System.out.print("w: up \t");
-        System.out.print("a: left \t");
-        System.out.print("s: down \t");
-        System.out.print("d: right \n");
-
-        Board.viewBoard();
-
-        // get the user input
-        String direction = selectDirection(cin.next());
-
-        // check if the user input is valid
-        if (direction.equals("")) {
-            System.out.println("Input error, check the instructions:");
-            this.live();
-        }
-
-        // check if the user requested to quit
-        if (direction.equals("q")) {
-            System.out.println("Quitting...");
-            this.die();
-        }
-
-        // movement
-        this.validateMove(direction);
-
-        // repeat if it's not game over
-        if (!Board.isGameOver())
-            this.live();
-
-    }
-
-    /**
-     * CLI movement
-     *
-     * - invalid moves => ignore
-     * - valid move with direction on empty-block => move
-     * - valid move with direction on enemy => game over
-     *
-     * @param direction - the movement direction
-     */
-    private void validateMove(String direction) {
-
-        switch (direction) {
-            case "down": {
-
-                if (Board.isEmpty((this.x+1), this.y)) {
-                    move(direction);
-                } else if (Board.isEnemy((this.x+1), this.y)) {
-                    this.die();
-                }
-
-                break;
-            }
-            case "up": {
-
-                if (Board.isEmpty((this.x-1), this.y)) {
-                    move(direction);
-                } else if (Board.isEnemy((this.x-1), this.y)) {
-                    this.die();
-                }
-
-                break;
-            }
-            case "right": {
-
-                if (Board.isEmpty(this.x, (this.y+1))) {
-                    move(direction);
-                } else if (Board.isEnemy(this.x, (this.y+1))) {
-                    this.die();
-                }
-
-                break;
-            }
-            case "left": {
-
-                if (Board.isEmpty(this.x, (this.y-1))) {
-                    move(direction);
-                } else if (Board.isEnemy(this.x, (this.y-1))) {
-                    this.die();
-                }
-
-                break;
-            }
-            default: break;
-        }
+        // listen user input
+        Board.logMessage = "Game Started, listening for key events";
+        listenKeys = true;
 
     }
 
     public void die() {
 
-        System.out.println("Game Over!");
+        Board.logMessage = "You died. Try again?";
         Board.setGameOver();
 
     }
 
-    /**
-     * User Input
-     * - directions: 'w', 'a', 's', 'd' (up, left, down, right).
-     * - closing the game: 'q'.
-     * - any other string is evaluated as empty string.
-     *
-     * @param input - user input
-     * @return - 'the direction', 'quit' or 'invalid'
-     */
-    private static String selectDirection(String input) {
+    // Detect Key Pressed
+    public void keyPressed(KeyEvent e) {
 
-        switch (input) {
-            case "w": return "up";
-            case "a": return "left";
-            case "s": return "down";
-            case "d": return "right";
-            case "q": return "q";
-            default:  return "";
+        int keyCode = e.getKeyCode();
+
+        if (keyCode == KeyEvent.VK_ESCAPE || keyCode == KeyEvent.VK_Q) {
+
+            // Board.logMessage = "Are you sure you want to exit?";
+            Board.setGameOver();
+
+        } else if (!Board.isGameOver() && listenKeys) {
+
+            if (keyCode == KeyEvent.VK_RIGHT) {
+
+                stepX = 1;
+
+                if (Board.isEmpty(this.x, (this.y+1))) {
+                    move("right");
+                } else if (Board.isEnemy(this.x, (this.y+1))) {
+                    this.die();
+                }
+
+            }
+
+            if (keyCode == KeyEvent.VK_LEFT) {
+
+                stepX = -1;
+
+                if (Board.isEmpty(this.x, (this.y-1))) {
+                    move("left");
+                } else if (Board.isEnemy(this.x, (this.y-1))) {
+                    this.die();
+                }
+
+            }
+
+            if (keyCode == KeyEvent.VK_UP) {
+
+                stepY = -1;
+
+                if (Board.isEmpty((this.x-1), this.y)) {
+                    move("up");
+                } else if (Board.isEnemy((this.x-1), this.y)) {
+                    this.die();
+                }
+
+            }
+
+            if (keyCode == KeyEvent.VK_DOWN) {
+
+                stepY = 1;
+
+                if (Board.isEmpty((this.x+1), this.y)) {
+                    move("down");
+                } else if (Board.isEnemy((this.x+1), this.y)) {
+                    this.die();
+                }
+
+            }
+
         }
 
+        Board.keyEventMessage = "Pressed: " + KeyEvent.getKeyText(keyCode);
+        e.consume();
+
+    }
+
+    // Detect key release
+    public void keyReleased(KeyEvent e) {
+
+        int keyCode = e.getKeyCode();
+
+        if (!Board.isGameOver() && listenKeys) {
+
+            if (keyCode == KeyEvent.VK_DOWN || (keyCode == KeyEvent.VK_UP)) {
+                stepY = 0;
+            }
+            if (keyCode == KeyEvent.VK_RIGHT || (keyCode == KeyEvent.VK_LEFT)) {
+                stepX = 0;
+            }
+
+        }
+
+        Board.keyEventMessage = "Released: " + KeyEvent.getKeyText(keyCode);
+        e.consume();
+
+    }
+
+    // required by KeyEvent
+    public void keyTyped(KeyEvent e) {
+        e.consume();
     }
 
 }

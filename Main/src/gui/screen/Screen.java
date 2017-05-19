@@ -23,32 +23,7 @@ public class Screen {
         GraphicsDevice[] gs = ge.getScreenDevices();
 
         if (gs.length > 0) {
-
-            DisplayMode dm = gs[0].getDisplayMode();
-            System.out.println("Screen info:");
-
-            int width = dm.getWidth();
-            int height = dm.getHeight();
-            System.out.println(width +"x"+ height);
-
-            int refreshRate = dm.getRefreshRate();
-
-            if (refreshRate == DisplayMode.REFRESH_RATE_UNKNOWN) {
-                System.out.println("Unknown rate");
-            } else {
-                System.out.println("Refresh rate: " + refreshRate);
-            }
-
-            int bitDepth = dm.getBitDepth();
-
-            if (bitDepth != DisplayMode.BIT_DEPTH_MULTI) {
-                System.out.println("BIT DEPTH: MULTI");
-            } else {
-                System.out.println("BIT DEPTH: " + bitDepth);
-            }
-
-            return dm;
-
+            return gs[0].getDisplayMode();
         }
 
         return null;
@@ -120,61 +95,10 @@ public class Screen {
 
     }
 
-    public int getWidth() {
-
-        Window w = vc.getFullScreenWindow();
-
-        if (w != null) {
-            return w.getWidth();
-        }
-
-        return 0;
-
-    }
-
-    public int getHeight() {
-
-        Window w = vc.getFullScreenWindow();
-
-        if (w != null) {
-            return w.getHeight();
-        }
-
-        return 0;
-
-    }
-
     public Window getFullScreen() {
 
         // get screen window
         return vc.getFullScreenWindow();
-
-    }
-
-    public DisplayMode[] getCompatibleDMs() {
-
-        // get compatible display modes
-        return vc.getDisplayModes();
-
-    }
-
-    public DisplayMode getCurrentDM() {
-
-        // the current dm
-        return vc.getDisplayMode();
-
-    }
-
-    public BufferedImage createImage(int w, int h, int t) {
-
-        Window window = vc.getFullScreenWindow();
-
-        if (window != null) {
-            GraphicsConfiguration gc = window.getGraphicsConfiguration();
-            return gc.createCompatibleImage(w, h, t);
-        }
-
-        return null;
 
     }
 

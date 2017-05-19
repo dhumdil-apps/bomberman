@@ -3,13 +3,30 @@ package core.board.block.blocks.moving;
 import core.board.Board;
 import core.board.block.Block;
 import core.board.block.blocks.standing.EmptyBlock;
+import gui.animation.Animation;
+import gui.sprite.Sprite;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
-public class Enemy extends Character implements Runnable {
+public class Enemy extends Character {
 
     public Enemy(int x, int y) {
         super(x, y);
+
+        Image image1 = new ImageIcon(this.getClass().getResource("/gui/resources/enemy1.png")).getImage();
+        Image image2 = new ImageIcon(this.getClass().getResource("/gui/resources/enemy2.png")).getImage();
+
+        // animate image
+        this.animation = new Animation();
+        this.animation.addScene(image1, 300);
+        this.animation.addScene(image2, 300);
+
+        // animate position
+        this.sprite = new Sprite(animation, (imageSize * this.y) + X, (imageSize * this.x) + Y);
+        Board.addSprite(this.sprite);
+
     }
 
     public void live() {
@@ -26,7 +43,7 @@ public class Enemy extends Character implements Runnable {
         do {
             // if tried all available directions => do nothing
             if (directions.size() == 0) {
-                move("sleep"); // Thread.sleep()
+                move("sleep"); // do nothing
                 break;
             }
 
@@ -37,9 +54,14 @@ public class Enemy extends Character implements Runnable {
 
         } while (this.isInvalidMove(direction));
 
-        // repeat if it's not game over
+        // repeat if is not game over
         if (!Board.isGameOver()) {
-            this.live();
+            try {
+                Thread.sleep(1000);
+                this.live();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
 
     }

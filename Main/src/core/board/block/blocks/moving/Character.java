@@ -3,14 +3,24 @@ package core.board.block.blocks.moving;
 import core.board.Board;
 import core.board.block.Block;
 import core.board.block.blocks.standing.EmptyBlock;
+import gui.animation.Animation;
+import gui.sprite.Sprite;
 
-abstract public class Character extends Block {
+abstract public class Character extends Block implements Runnable {
+
+    Sprite sprite;
+    Animation animation;
+    int stepX;
+    int stepY;
 
     Character(int x, int y) {
         super(x, y);
         Board.createBlock(this);
     }
 
+    /**
+     * Start live() method on Thread start
+     */
     public void run() {
         this.live();
     }
@@ -56,15 +66,31 @@ abstract public class Character extends Block {
 
                 break;
             }
-            default: break;
+            default: {
+                // Board.logMessage = "Ups, something went wrong...";
+                break;
+            }
         }
 
-        // simulate animation
-        try {
-            Thread.sleep(1000);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        update();
+
+    }
+
+    private void update() {
+
+        // update x position
+        if ( (this.sprite.getX() > X) && (this.sprite.getX() < (X + (Board.getLength()*imageSize))) ) {
+            stepX = 0;
         }
+        float positionX = ((imageSize * this.y) + X) + (stepX * imageSize);
+
+        // update y position
+        if ((this.sprite.getY() > Y) && (this.sprite.getY() < (Y + (Board.getLength()*imageSize))) ) {
+            stepY = 0;
+        }
+        float positionY = ((imageSize * this.x) + Y) + (stepY * imageSize);
+
+        this.sprite.updateXY(positionX, positionY);
 
     }
 

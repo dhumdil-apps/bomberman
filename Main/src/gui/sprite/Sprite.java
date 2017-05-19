@@ -9,20 +9,21 @@ public class Sprite {
     private float x;
     private float y;
 
-    // Sprite dimensions: 100x100
-    public Sprite(Animation animation) {
+    public Sprite(Animation animation, float x, float y) {
         this.animation = animation;
-    }
-
-    public void update(long timePassed, float x, float y) {
-
-        // update position
         this.x = x;
         this.y = y;
+    }
 
-        // animate
+    // animate
+    public void update(long timePassed) {
         this.animation.update(timePassed);
+    }
 
+    // position setter
+    public void updateXY(float x, float y) {
+        this.x = x;
+        this.y = y;
     }
 
     // Sprite Image getter
@@ -30,18 +31,14 @@ public class Sprite {
         return this.animation.getImage();
     }
 
-    // position getters/setters
+    // Position x getter
     public float getX() {
         return this.x;
     }
+
+    // Position y getter
     public float getY() {
         return this.y;
-    }
-    public void setX(long x) {
-        this.x = x;
-    }
-    public void setY(long y) {
-        this.y = y;
     }
 
 }
