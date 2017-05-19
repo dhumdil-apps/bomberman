@@ -39,7 +39,7 @@ public class Board extends JFrame {
         // (some calculations to generate the game content)
         final int SIZE = 2;
         int size = (SIZE * 2) + 3;
-        int countEnemies = 1;
+        int countEnemies = 2;
         int countBlocks = (SIZE * (SIZE + 1)) + ((SIZE + 1) * (((SIZE * 2) + 3) - 2));
         int countWalls = ((countBlocks - 9) > 0) ? (countBlocks - countEnemies - 9)/2 : 0;
 
