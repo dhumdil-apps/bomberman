@@ -57,7 +57,7 @@ public class Enemy extends Character {
         // repeat if is not game over
         if (!Board.isGameOver()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(800);
                 this.live();
             } catch (Exception e) {
                 System.out.println(e.getMessage());

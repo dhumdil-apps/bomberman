@@ -13,6 +13,8 @@ public class Wall extends Block {
 
         super(x, y);
 
+        System.out.println(x + " - " + y);
+
         Image img = new ImageIcon(this.getClass().getResource("/gui/resources/wall.png")).getImage();
         int positionX = (imageSize * this.y) + X;
         int positionY = (imageSize * this.x) + Y;

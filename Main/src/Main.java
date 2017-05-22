@@ -9,7 +9,7 @@ public class Main {
         game.run();
 
         // start game
-        game.start();
+        // game.start();
 
     }
 

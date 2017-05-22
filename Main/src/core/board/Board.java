@@ -24,7 +24,7 @@ public class Board extends JFrame {
     // CORE
     private static Block[][] board;
     private static boolean gameOver;
-    private Thread hero;
+    private ArrayList<Thread> characters;
     private static ArrayList<Sprite> sprites;
     private static ArrayList<ImageObject> images;
 
@@ -37,19 +37,19 @@ public class Board extends JFrame {
 
         // base config
         // (some calculations to generate the game content)
-        final int SIZE = 2;
-        int size = (SIZE * 2) + 3;
-        int countEnemies = 2;
-        int countBlocks = (SIZE * (SIZE + 1)) + ((SIZE + 1) * (((SIZE * 2) + 3) - 2));
-        int countWalls = ((countBlocks - 9) > 0) ? (countBlocks - countEnemies - 9)/2 : 0;
+        final int SIZE = 2; // sm
+        int length = SIZE + SIZE + 3;
+        int countEnemies = 1;
+        int countWalls = length - 10;
 
         // initialize
         gameOver = false;
-        board = new Block[size][size];
-        ArrayList<Block> emptyBlocks = new ArrayList<>(countBlocks);
+        board = new Block[length][length];
+        ArrayList<Block> emptyBlocks = new ArrayList<>();
         randomGenerator = new Random();
         sprites = new ArrayList<>();
         images = new ArrayList<>();
+        characters = new ArrayList<>();
 
         // load background image
         Image background = new ImageIcon(this.getClass().getResource("/gui/resources/bg.jpg")).getImage();
@@ -67,15 +67,15 @@ public class Board extends JFrame {
      *
      * @param block - the block to register in the board
      */
-    public static void createBlock(Block block) {
+    public synchronized static void createBlock(Block block) {
         board[block.x][block.y] = block;
     }
 
     /**
-     * Board initialization
-     * - place Borders
-     * - store Empty-blocks
-     * - reserve space for Hero
+     * Board initialization:
+     * - place borders
+     * - register empty blocks
+     * - reserve space for hero
      *
      * @param emptyBlocks - store empty-blocks for later
      */
@@ -91,8 +91,7 @@ public class Board extends JFrame {
 
                 } else if (i > 2 || j > 2) {
 
-                    // place empty blocks and store them,
-                    // used for initialization of walls and enemies
+                    // place empty blocks and store them
                     board[i][j] = new EmptyBlock(i, j);
                     emptyBlocks.add(board[i][j]);
 
@@ -120,8 +119,7 @@ public class Board extends JFrame {
         for (int i = 0; i < countEnemies; i++) {
 
             block = this.getRandomEmptyBlock(emptyBlocks);
-            Thread enemy = new Thread( new Enemy(block.x, block.y) );
-            enemy.start();
+            characters.add(new Thread( new Enemy(block.x, block.y) ));
 
         }
 
@@ -135,10 +133,11 @@ public class Board extends JFrame {
 
         Block block;
 
-        // TODO - check if there are available empty blocks
         for (int i = 0; i < countWalls; i++) {
+
             block = this.getRandomEmptyBlock(emptyBlocks);
             board[block.x][block.y] = new Wall(block.x, block.y);
+
         }
 
     }
@@ -165,7 +164,7 @@ public class Board extends JFrame {
      * @param emptyBlocks - list of the available empty blocks
      * @return - an empty block
      */
-    private Block getRandomEmptyBlock(ArrayList<Block> emptyBlocks) {
+    private synchronized Block getRandomEmptyBlock(ArrayList<Block> emptyBlocks) {
 
         int randomNumber = randomize(emptyBlocks.size());
 
@@ -285,7 +284,11 @@ public class Board extends JFrame {
             window.setFocusTraversalKeysEnabled(false);
 
             // create Hero (add him the key listener)
-            hero = new Thread( new Hero(1, 1, window) );
+            characters.add( new Thread( new Hero(1, 1, window) ) );
+
+            // init view:
+            // movieLoop();
+
 
         } catch (Exception e){
             System.out.println(e.getMessage());
@@ -294,13 +297,15 @@ public class Board extends JFrame {
     }
 
     /**
-     * Start
+     * Start the game (threads)
      */
     public void start() {
         try {
 
-            // TODO: start enemies
-            hero.start();
+            for (Thread character: characters) {
+                character.start();
+            }
+
             movieLoop();
 
         } finally {
